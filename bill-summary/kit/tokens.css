@@ -1,0 +1,388 @@
+/*
+ * 基础排版 Token（字号 / 字重 / 行高 / 字体族）
+ *
+ * 取值来源：Figma「駿通物流平面物料」→ 页面 `01 字号规范 · Typography`
+ * （file `Qga42PZH2x633ZebFNKDzT`，node `8016:882`）。
+ *
+ * 规范口径：
+ * - 英文字体 Poppins，中文使用 Noto Sans SC；字号单位 px。
+ * - Figma 中标注为 `Auto` 的行高 = 自动行高 150%（节点 lineHeightUnit = INTRINSIC_%），
+ *   这里落成倍数 `1.5`，用户调大系统默认字号时文本可随字号伸缩；标注为具体 px 的按设计稿写死。
+ * - 角色命名与设计稿「层级与场景」列一一对应，组件只消费角色 Token，禁止再写 px 字面量。
+ * - 运算符 / 金额类角色（metric-amount 及以上）配合数字字体栈使用：
+ *   `--dscp-font-family-merchant-numeric` + `--dscp-font-variant-numeric`（等宽数字，保证列对齐）。
+ *
+ * 与运营端的关系：运营端（`Dscp*`）沿用 `--dscp-font-size-*` 六级阶梯，
+ * 本文件的 `--dscp-type-*` 是商户端（`Mg*`）排版角色，两者互不覆盖。
+ */
+:root {
+  /* ---- 字体族 ---- */
+  --dscp-font-family-latin: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+  --dscp-font-family-cjk:
+    'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  /* 商户端文本栈：英文优先 Poppins，中文字形回落到 Noto Sans SC */
+  --dscp-font-family-merchant:
+    'Poppins', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --dscp-font-family-merchant-numeric:
+    'Poppins', 'Noto Sans SC', 'Helvetica Neue For Number', 'Helvetica Neue', Arial, sans-serif;
+
+  /* ---- 12px 档 ---- */
+  /* 辅助信息：分页 / 辅助说明 */
+  --dscp-type-aux-size: 12px;
+  --dscp-type-aux-weight: 400;
+  --dscp-type-aux-line-height: 20px;
+
+  /* 时间信息：时间戳 / 日期 */
+  --dscp-type-timestamp-size: 12px;
+  --dscp-type-timestamp-weight: 500;
+  --dscp-type-timestamp-line-height: 20px;
+
+  /* 移动端指标：移动端佣金指标标签 */
+  --dscp-type-mobile-metric-size: 12px;
+  --dscp-type-mobile-metric-weight: 600;
+  --dscp-type-mobile-metric-line-height: 18px;
+
+  /* ---- 14px 档 ---- */
+  /* 表格正文：单元格 / 次要信息 */
+  --dscp-type-table-cell-size: 14px;
+  --dscp-type-table-cell-weight: 500;
+  --dscp-type-table-cell-line-height: 1.5;
+
+  /* 表格强调：增长率 / 重点状态 */
+  --dscp-type-table-emphasis-size: 14px;
+  --dscp-type-table-emphasis-weight: 600;
+  --dscp-type-table-emphasis-line-height: 1.5;
+
+  /* ---- 16px 档 ---- */
+  /* 正文与按钮：常规正文 / 操作按钮 */
+  --dscp-type-body-size: 16px;
+  --dscp-type-body-weight: 500;
+  --dscp-type-body-line-height: 24px;
+
+  /* 正文强调：标签 / 关键字段 */
+  --dscp-type-body-strong-size: 16px;
+  --dscp-type-body-strong-weight: 600;
+  --dscp-type-body-strong-line-height: 24px;
+
+  /* ---- 18px 档 ---- */
+  /* 卡片标题：商户名称 / 紧凑单行标题 */
+  --dscp-type-card-title-size: 18px;
+  --dscp-type-card-title-weight: 600;
+  --dscp-type-card-title-line-height: 24px;
+
+  /* ---- 20px 档 ---- */
+  /* 模块标题：内容模块 */
+  --dscp-type-section-title-size: 20px;
+  --dscp-type-section-title-weight: 600;
+  --dscp-type-section-title-line-height: 1.5;
+
+  /* ---- 22px 档 ---- */
+  /* 移动端标题：移动端弹窗标题 */
+  --dscp-type-mobile-title-size: 22px;
+  --dscp-type-mobile-title-weight: 700;
+  --dscp-type-mobile-title-line-height: 32px;
+
+  /* ---- 28px 档 ---- */
+  /* 桌面弹窗标题 */
+  --dscp-type-dialog-title-size: 28px;
+  --dscp-type-dialog-title-weight: 600;
+  --dscp-type-dialog-title-line-height: 40px;
+
+  /* 页面标题：页面主标题 */
+  --dscp-type-page-title-size: 28px;
+  --dscp-type-page-title-weight: 700;
+  --dscp-type-page-title-line-height: 1.5;
+
+  /* ---- 金额 / 数值档 ---- */
+  /* 指标金额：统计卡片 */
+  --dscp-type-metric-amount-size: 30px;
+  --dscp-type-metric-amount-weight: 600;
+  --dscp-type-metric-amount-line-height: 1.5;
+
+  /* 钱包余额：钱包关键金额 */
+  --dscp-type-wallet-balance-size: 36px;
+  --dscp-type-wallet-balance-weight: 700;
+  --dscp-type-wallet-balance-line-height: 1.5;
+
+  /* 提现金额：提现信息 */
+  --dscp-type-withdraw-amount-size: 40px;
+  --dscp-type-withdraw-amount-weight: 600;
+  --dscp-type-withdraw-amount-line-height: 1.5;
+
+  /* 核心余额：首页核心数值 */
+  --dscp-type-core-balance-size: 64px;
+  --dscp-type-core-balance-weight: 600;
+  --dscp-type-core-balance-line-height: 1.5;
+}
+
+:root,
+[data-dscp-theme='element'] {
+  color-scheme: light;
+
+  --dscp-color-primary: #409eff;
+  --dscp-color-primary-hover: #66b1ff;
+  --dscp-color-primary-light-3: #79bbff;
+  --dscp-color-primary-light-5: #a0cfff;
+  --dscp-color-primary-light-7: #c6e2ff;
+  --dscp-color-primary-light-8: #d9ecff;
+  --dscp-color-primary-light-9: #ecf5ff;
+  --dscp-color-success: #67c23a;
+  --dscp-color-warning: #e6a23c;
+  --dscp-color-danger: #f56c6c;
+  --dscp-color-info: #909399;
+
+  --dscp-color-text-primary: #303133;
+  --dscp-color-text-regular: #606266;
+  --dscp-color-text-secondary: #909399;
+  --dscp-color-text-placeholder: #c0c4cc;
+  --dscp-color-border: #dcdfe6;
+  --dscp-color-border-light: #e4e7ed;
+  --dscp-color-border-lighter: #ebeef5;
+  --dscp-color-border-extra-light: #f2f6fc;
+  --dscp-color-surface: #ffffff;
+  --dscp-color-background: #ffffff;
+
+  /* Element Plus semantic variables inherited by controls and teleported overlays. */
+  --el-bg-color: #ffffff;
+  --el-bg-color-page: #f2f3f5;
+  --el-bg-color-overlay: #ffffff;
+  --el-text-color-primary: #303133;
+  --el-text-color-regular: #606266;
+  --el-text-color-secondary: #909399;
+  --el-text-color-placeholder: #a8abb2;
+  --el-border-color: #dcdfe6;
+  --el-border-color-light: #e4e7ed;
+  --el-border-color-lighter: #ebeef5;
+  --el-fill-color: #f0f2f5;
+  --el-fill-color-light: #f5f7fa;
+  --el-fill-color-lighter: #fafafa;
+  --el-fill-color-blank: #ffffff;
+
+  /* ---- tags：标签组默认底色 / 文字色（对齐 mg 设计稿 #eef2f7 / #475569） ---- */
+  --dscp-tags-item-background: #eef2f7;
+  --dscp-tags-item-text: #475569;
+
+  --dscp-font-family:
+    'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', SimSun,
+    sans-serif;
+
+  --dscp-gap-2xs: 4px;
+
+  --dscp-font-size-extra-large: 20px;
+  --dscp-font-size-large: 18px;
+  --dscp-font-size-medium: 16px;
+  --dscp-font-size-base: 14px;
+  --dscp-font-size-small: 13px;
+  --dscp-font-size-extra-small: 12px;
+
+  /*
+   * ---- 排版（运营端）----
+   * 取值来源：mg-dscp-admin 物流追踪页 src/views/logistics/tracking/index.vue:591-727
+   * 与现有组件实际用法逐项核对；角色字号一律引用上方六级阶梯，不新增档位。
+   * 使用约定见 docs/design-system.md「排版」与 apps/docs/tokens/index.md。
+   */
+  --dscp-font-size-page-title: var(--dscp-font-size-extra-large);
+  --dscp-font-size-section-title: var(--dscp-font-size-medium);
+  --dscp-font-size-body: var(--dscp-font-size-base);
+  --dscp-font-size-caption: var(--dscp-font-size-small);
+  --dscp-font-size-aux: var(--dscp-font-size-extra-small);
+  /*
+   * 表头：与正文同档 14px，对齐 Element UI 默认与 kit 表格基线；
+   * 不再沿用 mg 全局 13px（rice.scss:60-75）与物流追踪页的 12px 覆盖。
+   */
+  --dscp-font-size-table-header: var(--dscp-font-size-base);
+
+  /* 字重：400 正文 / 500 交互控件 / 600 组件标题 / 700 业务强调 */
+  --dscp-font-weight-regular: 400;
+  --dscp-font-weight-medium: 500;
+  --dscp-font-weight-semibold: 600;
+  --dscp-font-weight-bold: 700;
+
+  /* 行高用倍数制：用户调大系统默认字号时文本可随字号伸缩 */
+  --dscp-line-height-tight: 1.2;
+  --dscp-line-height-title: 1.4;
+  --dscp-line-height-body: 1.5;
+
+  /* 数字排版：单号 / 金额 / 统计值用数字专用栈 + 等宽字形，保证列对齐 */
+  --dscp-font-family-numeric: 'Helvetica Neue For Number', 'Helvetica Neue', Arial, sans-serif;
+  --dscp-font-variant-numeric: tabular-nums;
+
+  /* Element 字体图标字号：仅限图标字形，禁止用于文本 */
+  --dscp-icon-font-size-sm: 12px;
+  --dscp-icon-font-size-md: 14px;
+  --dscp-icon-font-size-lg: 16px;
+
+  --dscp-space-2xs: 4px;
+  --dscp-space-xs: 8px;
+  --dscp-space-sm: 12px;
+  --dscp-space-md: 16px;
+  --dscp-space-lg: 20px;
+  --dscp-space-xl: 24px;
+  --dscp-space-2xl: 32px;
+
+  --dscp-control-height-large: 40px;
+  --dscp-control-height-default: 32px;
+  --dscp-control-height-small: 28px;
+  --dscp-border-radius: 4px;
+  --dscp-border-radius-small: 2px;
+  --dscp-shadow-floating: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  --dscp-duration-fast: 160ms;
+  --dscp-duration-base: 240ms;
+  --dscp-z-sticky: 10;
+  --dscp-z-fixed: 100;
+
+  /* ---- layout：侧边栏（对齐 mg variables.scss，前期保持一致） ---- */
+  --dscp-layout-sidebar-width: 210px;
+  --dscp-layout-sidebar-collapsed-width: 64px;
+  --dscp-layout-sidebar-item-height: 50px;
+  --dscp-layout-sidebar-icon-slot-width: 24px;
+  --dscp-layout-sidebar-icon-size: 16px;
+  --dscp-layout-sidebar-icon-gap: 5px;
+  --dscp-layout-sidebar-border-radius: 50px;
+  --dscp-layout-header-height: 48px;
+  --dscp-layout-tags-view-height: 34px;
+  /* 混合布局顶部导航栏高度 */
+  --dscp-layout-mixed-top-height: 48px;
+  /* 页脚高度 */
+  --dscp-layout-footer-height: 40px;
+  /* 水平菜单高度 */
+  --dscp-layout-horizontal-menu-height: 48px;
+  /* 深色侧边栏 */
+  --dscp-layout-menu-bg: #1f2d3d;
+  --dscp-layout-menu-text: #ffffff;
+  --dscp-layout-menu-active-text: #409eff;
+  --dscp-layout-sub-menu-active-text: #f4f4f5;
+  --dscp-layout-menu-hover: #263445;
+  --dscp-layout-sub-menu-bg: #1f2d3d;
+  --dscp-layout-sub-menu-hover: #001528;
+  --dscp-layout-sidebar-title: #ffffff;
+  /* 浅色侧边栏（取值对齐 pure-admin light 主题：白底 / 60% 文字 / hover 仅文字加深 / 激活项主色圆角色块白字） */
+  --dscp-layout-menu-light-bg: #ffffff;
+  --dscp-layout-menu-light-text: rgba(0, 0, 0, 0.6);
+  --dscp-layout-menu-light-title-hover: #000000;
+  --dscp-layout-menu-light-active-text: rgba(0, 0, 0, 0.85);
+  --dscp-layout-menu-light-item-active-text: #ffffff;
+  --dscp-layout-menu-light-hover: #f6f6f6;
+  --dscp-layout-menu-light-sub-bg: #ffffff;
+  --dscp-layout-menu-light-border: #e4e7ed;
+  --dscp-layout-sidebar-light-title: #001529;
+  /* navbar */
+  --dscp-layout-navbar-bg: #ffffff;
+  --dscp-layout-navbar-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  /* tags-view */
+  --dscp-layout-tags-view-bg: #ffffff;
+  --dscp-layout-tags-view-border: #d8dce5;
+  --dscp-layout-tags-view-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 0 3px 0 rgba(0, 0, 0, 0.04);
+  --dscp-layout-tags-view-item-bg: #ffffff;
+  --dscp-layout-tags-view-item-text: #303133;
+  --dscp-layout-tags-view-item-hover-bg: #dee1e6;
+  --dscp-layout-tags-view-item-hover-text: #1f1f1f;
+  --dscp-layout-tags-view-item-active-text: #ffffff;
+  /* 搜索/通知面板 */
+  --dscp-layout-search-panel-z: 2000;
+  --dscp-layout-notice-panel-z: 2000;
+  /* 设置面板宽度 */
+  --dscp-layout-settings-width: 280px;
+  /* 内容区过渡动效 */
+  --dscp-layout-transition-duration: 0.28s;
+  /* 标签样式：chrome / card / smart */
+  --dscp-layout-tags-style: chrome;
+  /* 灰色模式滤镜 */
+  --dscp-layout-grey-mode-filter: grayscale(100%);
+  /* 色弱模式滤镜 */
+  --dscp-layout-color-weak-filter: invert(80%);
+  /* 页面切换动画 */
+  --dscp-layout-page-transition: fade;
+
+  /* ---- Element Plus primary color derivation ---- */
+  --dscp-color-primary-light-1: #53a8ff;
+  --dscp-color-primary-light-2: #66b1ff;
+  --dscp-color-primary-light-3: #79bbff;
+  --dscp-color-primary-light-4: #8cc5ff;
+  --dscp-color-primary-light-5: #a0cfff;
+  --dscp-color-primary-light-6: #b3d8ff;
+  --dscp-color-primary-light-7: #c6e2ff;
+  --dscp-color-primary-light-8: #d9ecff;
+  --dscp-color-primary-light-9: #ecf5ff;
+  --dscp-color-primary-dark-2: #337ecc;
+}
+
+/* ===== 深色模式 token ===== */
+[data-dscp-color-mode='dark'] {
+  color-scheme: dark;
+
+  --dscp-color-text-primary: #e5eaf3;
+  --dscp-color-text-regular: #cfd3dc;
+  --dscp-color-text-secondary: #a3a6ad;
+  --dscp-color-text-placeholder: #8d9095;
+  --dscp-color-border: #4c4d4f;
+  --dscp-color-border-light: #414243;
+  --dscp-color-border-lighter: #363637;
+  --dscp-color-border-extra-light: #2b2b2c;
+  --dscp-color-surface: #1d1e1f;
+  --dscp-color-background: #141414;
+
+  --el-bg-color: #141414;
+  --el-bg-color-page: #0a0a0a;
+  --el-bg-color-overlay: #1d1e1f;
+  --el-text-color-primary: #e5eaf3;
+  --el-text-color-regular: #cfd3dc;
+  --el-text-color-secondary: #a3a6ad;
+  --el-text-color-placeholder: #8d9095;
+  --el-border-color: #4c4d4f;
+  --el-border-color-light: #414243;
+  --el-border-color-lighter: #363637;
+  --el-fill-color: #303030;
+  --el-fill-color-light: #262727;
+  --el-fill-color-lighter: #1d1d1d;
+  --el-fill-color-blank: transparent;
+
+  /* ---- tags：标签组默认底色 / 文字色（对齐深色填充 / 常规文字档位） ---- */
+  --dscp-tags-item-background: #262727;
+  --dscp-tags-item-text: #cfd3dc;
+
+  /* 深色侧边栏 */
+  --dscp-layout-menu-bg: #1d1e1f;
+  --dscp-layout-menu-text: #cfd3dc;
+  --dscp-layout-menu-active-text: #409eff;
+  --dscp-layout-sub-menu-active-text: #e5eaf3;
+  --dscp-layout-menu-hover: #2b2b2c;
+  --dscp-layout-sub-menu-bg: #1d1e1f;
+  --dscp-layout-sub-menu-hover: #2b2b2c;
+  --dscp-layout-sidebar-title: #e5eaf3;
+  /* 浅色侧边栏（深色模式下保持浅色取值用于对比；变量语义与亮色段一致） */
+  --dscp-layout-menu-light-bg: #ffffff;
+  --dscp-layout-menu-light-text: rgba(0, 0, 0, 0.6);
+  --dscp-layout-menu-light-title-hover: #000000;
+  --dscp-layout-menu-light-active-text: rgba(0, 0, 0, 0.85);
+  --dscp-layout-menu-light-item-active-text: #ffffff;
+  --dscp-layout-menu-light-hover: #f6f6f6;
+  --dscp-layout-menu-light-sub-bg: #ffffff;
+  --dscp-layout-menu-light-border: #e4e7ed;
+  --dscp-layout-sidebar-light-title: #001529;
+  /* navbar */
+  --dscp-layout-navbar-bg: #1d1e1f;
+  --dscp-layout-navbar-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  /* tags-view */
+  --dscp-layout-tags-view-bg: #1d1e1f;
+  --dscp-layout-tags-view-border: #4c4d4f;
+  --dscp-layout-tags-view-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --dscp-layout-tags-view-item-bg: #2b2b2c;
+  --dscp-layout-tags-view-item-text: #cfd3dc;
+  --dscp-layout-tags-view-item-hover-bg: #dee1e6;
+  --dscp-layout-tags-view-item-hover-text: #1f1f1f;
+  --dscp-layout-tags-view-item-active-text: #ffffff;
+}
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 组件库默认去掉 a 标签的下划线 */
+a {
+  text-decoration: none;
+}
+

@@ -1,0 +1,3502 @@
+/*
+ * 基础排版 Token（字号 / 字重 / 行高 / 字体族）
+ *
+ * 取值来源：Figma「駿通物流平面物料」→ 页面 `01 字号规范 · Typography`
+ * （file `Qga42PZH2x633ZebFNKDzT`，node `8016:882`）。
+ *
+ * 规范口径：
+ * - 英文字体 Poppins，中文使用 Noto Sans SC；字号单位 px。
+ * - Figma 中标注为 `Auto` 的行高 = 自动行高 150%（节点 lineHeightUnit = INTRINSIC_%），
+ *   这里落成倍数 `1.5`，用户调大系统默认字号时文本可随字号伸缩；标注为具体 px 的按设计稿写死。
+ * - 角色命名与设计稿「层级与场景」列一一对应，组件只消费角色 Token，禁止再写 px 字面量。
+ * - 运算符 / 金额类角色（metric-amount 及以上）配合数字字体栈使用：
+ *   `--dscp-font-family-merchant-numeric` + `--dscp-font-variant-numeric`（等宽数字，保证列对齐）。
+ *
+ * 与运营端的关系：运营端（`Dscp*`）沿用 `--dscp-font-size-*` 六级阶梯，
+ * 本文件的 `--dscp-type-*` 是商户端（`Mg*`）排版角色，两者互不覆盖。
+ */
+:root {
+  /* ---- 字体族 ---- */
+  --dscp-font-family-latin: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+  --dscp-font-family-cjk:
+    'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  /* 商户端文本栈：英文优先 Poppins，中文字形回落到 Noto Sans SC */
+  --dscp-font-family-merchant:
+    'Poppins', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --dscp-font-family-merchant-numeric:
+    'Poppins', 'Noto Sans SC', 'Helvetica Neue For Number', 'Helvetica Neue', Arial, sans-serif;
+
+  /* ---- 12px 档 ---- */
+  /* 辅助信息：分页 / 辅助说明 */
+  --dscp-type-aux-size: 12px;
+  --dscp-type-aux-weight: 400;
+  --dscp-type-aux-line-height: 20px;
+
+  /* 时间信息：时间戳 / 日期 */
+  --dscp-type-timestamp-size: 12px;
+  --dscp-type-timestamp-weight: 500;
+  --dscp-type-timestamp-line-height: 20px;
+
+  /* 移动端指标：移动端佣金指标标签 */
+  --dscp-type-mobile-metric-size: 12px;
+  --dscp-type-mobile-metric-weight: 600;
+  --dscp-type-mobile-metric-line-height: 18px;
+
+  /* ---- 14px 档 ---- */
+  /* 表格正文：单元格 / 次要信息 */
+  --dscp-type-table-cell-size: 14px;
+  --dscp-type-table-cell-weight: 500;
+  --dscp-type-table-cell-line-height: 1.5;
+
+  /* 表格强调：增长率 / 重点状态 */
+  --dscp-type-table-emphasis-size: 14px;
+  --dscp-type-table-emphasis-weight: 600;
+  --dscp-type-table-emphasis-line-height: 1.5;
+
+  /* ---- 16px 档 ---- */
+  /* 正文与按钮：常规正文 / 操作按钮 */
+  --dscp-type-body-size: 16px;
+  --dscp-type-body-weight: 500;
+  --dscp-type-body-line-height: 24px;
+
+  /* 正文强调：标签 / 关键字段 */
+  --dscp-type-body-strong-size: 16px;
+  --dscp-type-body-strong-weight: 600;
+  --dscp-type-body-strong-line-height: 24px;
+
+  /* ---- 18px 档 ---- */
+  /* 卡片标题：商户名称 / 紧凑单行标题 */
+  --dscp-type-card-title-size: 18px;
+  --dscp-type-card-title-weight: 600;
+  --dscp-type-card-title-line-height: 24px;
+
+  /* ---- 20px 档 ---- */
+  /* 模块标题：内容模块 */
+  --dscp-type-section-title-size: 20px;
+  --dscp-type-section-title-weight: 600;
+  --dscp-type-section-title-line-height: 1.5;
+
+  /* ---- 22px 档 ---- */
+  /* 移动端标题：移动端弹窗标题 */
+  --dscp-type-mobile-title-size: 22px;
+  --dscp-type-mobile-title-weight: 700;
+  --dscp-type-mobile-title-line-height: 32px;
+
+  /* ---- 28px 档 ---- */
+  /* 桌面弹窗标题 */
+  --dscp-type-dialog-title-size: 28px;
+  --dscp-type-dialog-title-weight: 600;
+  --dscp-type-dialog-title-line-height: 40px;
+
+  /* 页面标题：页面主标题 */
+  --dscp-type-page-title-size: 28px;
+  --dscp-type-page-title-weight: 700;
+  --dscp-type-page-title-line-height: 1.5;
+
+  /* ---- 金额 / 数值档 ---- */
+  /* 指标金额：统计卡片 */
+  --dscp-type-metric-amount-size: 30px;
+  --dscp-type-metric-amount-weight: 600;
+  --dscp-type-metric-amount-line-height: 1.5;
+
+  /* 钱包余额：钱包关键金额 */
+  --dscp-type-wallet-balance-size: 36px;
+  --dscp-type-wallet-balance-weight: 700;
+  --dscp-type-wallet-balance-line-height: 1.5;
+
+  /* 提现金额：提现信息 */
+  --dscp-type-withdraw-amount-size: 40px;
+  --dscp-type-withdraw-amount-weight: 600;
+  --dscp-type-withdraw-amount-line-height: 1.5;
+
+  /* 核心余额：首页核心数值 */
+  --dscp-type-core-balance-size: 64px;
+  --dscp-type-core-balance-weight: 600;
+  --dscp-type-core-balance-line-height: 1.5;
+}
+
+:root,
+[data-dscp-theme='element'] {
+  color-scheme: light;
+
+  --dscp-color-primary: #409eff;
+  --dscp-color-primary-hover: #66b1ff;
+  --dscp-color-primary-light-3: #79bbff;
+  --dscp-color-primary-light-5: #a0cfff;
+  --dscp-color-primary-light-7: #c6e2ff;
+  --dscp-color-primary-light-8: #d9ecff;
+  --dscp-color-primary-light-9: #ecf5ff;
+  --dscp-color-success: #67c23a;
+  --dscp-color-warning: #e6a23c;
+  --dscp-color-danger: #f56c6c;
+  --dscp-color-info: #909399;
+
+  --dscp-color-text-primary: #303133;
+  --dscp-color-text-regular: #606266;
+  --dscp-color-text-secondary: #909399;
+  --dscp-color-text-placeholder: #c0c4cc;
+  --dscp-color-border: #dcdfe6;
+  --dscp-color-border-light: #e4e7ed;
+  --dscp-color-border-lighter: #ebeef5;
+  --dscp-color-border-extra-light: #f2f6fc;
+  --dscp-color-surface: #ffffff;
+  --dscp-color-background: #ffffff;
+
+  /* Element Plus semantic variables inherited by controls and teleported overlays. */
+  --el-bg-color: #ffffff;
+  --el-bg-color-page: #f2f3f5;
+  --el-bg-color-overlay: #ffffff;
+  --el-text-color-primary: #303133;
+  --el-text-color-regular: #606266;
+  --el-text-color-secondary: #909399;
+  --el-text-color-placeholder: #a8abb2;
+  --el-border-color: #dcdfe6;
+  --el-border-color-light: #e4e7ed;
+  --el-border-color-lighter: #ebeef5;
+  --el-fill-color: #f0f2f5;
+  --el-fill-color-light: #f5f7fa;
+  --el-fill-color-lighter: #fafafa;
+  --el-fill-color-blank: #ffffff;
+
+  /* ---- tags：标签组默认底色 / 文字色（对齐 mg 设计稿 #eef2f7 / #475569） ---- */
+  --dscp-tags-item-background: #eef2f7;
+  --dscp-tags-item-text: #475569;
+
+  --dscp-font-family:
+    'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', SimSun,
+    sans-serif;
+
+  --dscp-gap-2xs: 4px;
+
+  --dscp-font-size-extra-large: 20px;
+  --dscp-font-size-large: 18px;
+  --dscp-font-size-medium: 16px;
+  --dscp-font-size-base: 14px;
+  --dscp-font-size-small: 13px;
+  --dscp-font-size-extra-small: 12px;
+
+  /*
+   * ---- 排版（运营端）----
+   * 取值来源：mg-dscp-admin 物流追踪页 src/views/logistics/tracking/index.vue:591-727
+   * 与现有组件实际用法逐项核对；角色字号一律引用上方六级阶梯，不新增档位。
+   * 使用约定见 docs/design-system.md「排版」与 apps/docs/tokens/index.md。
+   */
+  --dscp-font-size-page-title: var(--dscp-font-size-extra-large);
+  --dscp-font-size-section-title: var(--dscp-font-size-medium);
+  --dscp-font-size-body: var(--dscp-font-size-base);
+  --dscp-font-size-caption: var(--dscp-font-size-small);
+  --dscp-font-size-aux: var(--dscp-font-size-extra-small);
+  /*
+   * 表头：与正文同档 14px，对齐 Element UI 默认与 kit 表格基线；
+   * 不再沿用 mg 全局 13px（rice.scss:60-75）与物流追踪页的 12px 覆盖。
+   */
+  --dscp-font-size-table-header: var(--dscp-font-size-base);
+
+  /* 字重：400 正文 / 500 交互控件 / 600 组件标题 / 700 业务强调 */
+  --dscp-font-weight-regular: 400;
+  --dscp-font-weight-medium: 500;
+  --dscp-font-weight-semibold: 600;
+  --dscp-font-weight-bold: 700;
+
+  /* 行高用倍数制：用户调大系统默认字号时文本可随字号伸缩 */
+  --dscp-line-height-tight: 1.2;
+  --dscp-line-height-title: 1.4;
+  --dscp-line-height-body: 1.5;
+
+  /* 数字排版：单号 / 金额 / 统计值用数字专用栈 + 等宽字形，保证列对齐 */
+  --dscp-font-family-numeric: 'Helvetica Neue For Number', 'Helvetica Neue', Arial, sans-serif;
+  --dscp-font-variant-numeric: tabular-nums;
+
+  /* Element 字体图标字号：仅限图标字形，禁止用于文本 */
+  --dscp-icon-font-size-sm: 12px;
+  --dscp-icon-font-size-md: 14px;
+  --dscp-icon-font-size-lg: 16px;
+
+  --dscp-space-2xs: 4px;
+  --dscp-space-xs: 8px;
+  --dscp-space-sm: 12px;
+  --dscp-space-md: 16px;
+  --dscp-space-lg: 20px;
+  --dscp-space-xl: 24px;
+  --dscp-space-2xl: 32px;
+
+  --dscp-control-height-large: 40px;
+  --dscp-control-height-default: 32px;
+  --dscp-control-height-small: 28px;
+  --dscp-border-radius: 4px;
+  --dscp-border-radius-small: 2px;
+  --dscp-shadow-floating: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  --dscp-duration-fast: 160ms;
+  --dscp-duration-base: 240ms;
+  --dscp-z-sticky: 10;
+  --dscp-z-fixed: 100;
+
+  /* ---- layout：侧边栏（对齐 mg variables.scss，前期保持一致） ---- */
+  --dscp-layout-sidebar-width: 210px;
+  --dscp-layout-sidebar-collapsed-width: 64px;
+  --dscp-layout-sidebar-item-height: 50px;
+  --dscp-layout-sidebar-icon-slot-width: 24px;
+  --dscp-layout-sidebar-icon-size: 16px;
+  --dscp-layout-sidebar-icon-gap: 5px;
+  --dscp-layout-sidebar-border-radius: 50px;
+  --dscp-layout-header-height: 48px;
+  --dscp-layout-tags-view-height: 34px;
+  /* 混合布局顶部导航栏高度 */
+  --dscp-layout-mixed-top-height: 48px;
+  /* 页脚高度 */
+  --dscp-layout-footer-height: 40px;
+  /* 水平菜单高度 */
+  --dscp-layout-horizontal-menu-height: 48px;
+  /* 深色侧边栏 */
+  --dscp-layout-menu-bg: #1f2d3d;
+  --dscp-layout-menu-text: #ffffff;
+  --dscp-layout-menu-active-text: #409eff;
+  --dscp-layout-sub-menu-active-text: #f4f4f5;
+  --dscp-layout-menu-hover: #263445;
+  --dscp-layout-sub-menu-bg: #1f2d3d;
+  --dscp-layout-sub-menu-hover: #001528;
+  --dscp-layout-sidebar-title: #ffffff;
+  /* 浅色侧边栏（取值对齐 pure-admin light 主题：白底 / 60% 文字 / hover 仅文字加深 / 激活项主色圆角色块白字） */
+  --dscp-layout-menu-light-bg: #ffffff;
+  --dscp-layout-menu-light-text: rgba(0, 0, 0, 0.6);
+  --dscp-layout-menu-light-title-hover: #000000;
+  --dscp-layout-menu-light-active-text: rgba(0, 0, 0, 0.85);
+  --dscp-layout-menu-light-item-active-text: #ffffff;
+  --dscp-layout-menu-light-hover: #f6f6f6;
+  --dscp-layout-menu-light-sub-bg: #ffffff;
+  --dscp-layout-menu-light-border: #e4e7ed;
+  --dscp-layout-sidebar-light-title: #001529;
+  /* navbar */
+  --dscp-layout-navbar-bg: #ffffff;
+  --dscp-layout-navbar-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  /* tags-view */
+  --dscp-layout-tags-view-bg: #ffffff;
+  --dscp-layout-tags-view-border: #d8dce5;
+  --dscp-layout-tags-view-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 0 3px 0 rgba(0, 0, 0, 0.04);
+  --dscp-layout-tags-view-item-bg: #ffffff;
+  --dscp-layout-tags-view-item-text: #303133;
+  --dscp-layout-tags-view-item-hover-bg: #dee1e6;
+  --dscp-layout-tags-view-item-hover-text: #1f1f1f;
+  --dscp-layout-tags-view-item-active-text: #ffffff;
+  /* 搜索/通知面板 */
+  --dscp-layout-search-panel-z: 2000;
+  --dscp-layout-notice-panel-z: 2000;
+  /* 设置面板宽度 */
+  --dscp-layout-settings-width: 280px;
+  /* 内容区过渡动效 */
+  --dscp-layout-transition-duration: 0.28s;
+  /* 标签样式：chrome / card / smart */
+  --dscp-layout-tags-style: chrome;
+  /* 灰色模式滤镜 */
+  --dscp-layout-grey-mode-filter: grayscale(100%);
+  /* 色弱模式滤镜 */
+  --dscp-layout-color-weak-filter: invert(80%);
+  /* 页面切换动画 */
+  --dscp-layout-page-transition: fade;
+
+  /* ---- Element Plus primary color derivation ---- */
+  --dscp-color-primary-light-1: #53a8ff;
+  --dscp-color-primary-light-2: #66b1ff;
+  --dscp-color-primary-light-3: #79bbff;
+  --dscp-color-primary-light-4: #8cc5ff;
+  --dscp-color-primary-light-5: #a0cfff;
+  --dscp-color-primary-light-6: #b3d8ff;
+  --dscp-color-primary-light-7: #c6e2ff;
+  --dscp-color-primary-light-8: #d9ecff;
+  --dscp-color-primary-light-9: #ecf5ff;
+  --dscp-color-primary-dark-2: #337ecc;
+}
+
+/* ===== 深色模式 token ===== */
+[data-dscp-color-mode='dark'] {
+  color-scheme: dark;
+
+  --dscp-color-text-primary: #e5eaf3;
+  --dscp-color-text-regular: #cfd3dc;
+  --dscp-color-text-secondary: #a3a6ad;
+  --dscp-color-text-placeholder: #8d9095;
+  --dscp-color-border: #4c4d4f;
+  --dscp-color-border-light: #414243;
+  --dscp-color-border-lighter: #363637;
+  --dscp-color-border-extra-light: #2b2b2c;
+  --dscp-color-surface: #1d1e1f;
+  --dscp-color-background: #141414;
+
+  --el-bg-color: #141414;
+  --el-bg-color-page: #0a0a0a;
+  --el-bg-color-overlay: #1d1e1f;
+  --el-text-color-primary: #e5eaf3;
+  --el-text-color-regular: #cfd3dc;
+  --el-text-color-secondary: #a3a6ad;
+  --el-text-color-placeholder: #8d9095;
+  --el-border-color: #4c4d4f;
+  --el-border-color-light: #414243;
+  --el-border-color-lighter: #363637;
+  --el-fill-color: #303030;
+  --el-fill-color-light: #262727;
+  --el-fill-color-lighter: #1d1d1d;
+  --el-fill-color-blank: transparent;
+
+  /* ---- tags：标签组默认底色 / 文字色（对齐深色填充 / 常规文字档位） ---- */
+  --dscp-tags-item-background: #262727;
+  --dscp-tags-item-text: #cfd3dc;
+
+  /* 深色侧边栏 */
+  --dscp-layout-menu-bg: #1d1e1f;
+  --dscp-layout-menu-text: #cfd3dc;
+  --dscp-layout-menu-active-text: #409eff;
+  --dscp-layout-sub-menu-active-text: #e5eaf3;
+  --dscp-layout-menu-hover: #2b2b2c;
+  --dscp-layout-sub-menu-bg: #1d1e1f;
+  --dscp-layout-sub-menu-hover: #2b2b2c;
+  --dscp-layout-sidebar-title: #e5eaf3;
+  /* 浅色侧边栏（深色模式下保持浅色取值用于对比；变量语义与亮色段一致） */
+  --dscp-layout-menu-light-bg: #ffffff;
+  --dscp-layout-menu-light-text: rgba(0, 0, 0, 0.6);
+  --dscp-layout-menu-light-title-hover: #000000;
+  --dscp-layout-menu-light-active-text: rgba(0, 0, 0, 0.85);
+  --dscp-layout-menu-light-item-active-text: #ffffff;
+  --dscp-layout-menu-light-hover: #f6f6f6;
+  --dscp-layout-menu-light-sub-bg: #ffffff;
+  --dscp-layout-menu-light-border: #e4e7ed;
+  --dscp-layout-sidebar-light-title: #001529;
+  /* navbar */
+  --dscp-layout-navbar-bg: #1d1e1f;
+  --dscp-layout-navbar-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  /* tags-view */
+  --dscp-layout-tags-view-bg: #1d1e1f;
+  --dscp-layout-tags-view-border: #4c4d4f;
+  --dscp-layout-tags-view-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --dscp-layout-tags-view-item-bg: #2b2b2c;
+  --dscp-layout-tags-view-item-text: #cfd3dc;
+  --dscp-layout-tags-view-item-hover-bg: #dee1e6;
+  --dscp-layout-tags-view-item-hover-text: #1f1f1f;
+  --dscp-layout-tags-view-item-active-text: #ffffff;
+}
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 组件库默认去掉 a 标签的下划线 */
+a {
+  text-decoration: none;
+}
+
+[data-dscp-component='button'] {
+  border-radius: var(--dscp-border-radius);
+  font-family: var(--dscp-font-family);
+  font-size: var(--dscp-font-size-base);
+  transition-duration: var(--dscp-duration-fast);
+}
+
+[data-dscp-component='button']:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-dscp-component='button'] {
+    transition-duration: 0.01ms;
+  }
+}
+
+
+.dscp-button-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+/* 直接按钮组：内联弹性盒，宽度由内容决定（block 模式下由下方规则改为撑满分摊） */
+.dscp-button-group > .el-button-group {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+/* 溢出下拉：贴紧按钮组（共享 1px 边框），触发按钮左侧直角与组内按钮衔接 */
+.dscp-button-group > .el-dropdown {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.dscp-button-group > .el-button-group + .el-dropdown {
+  margin-left: -1px;
+}
+
+/*
+ * 触发按钮：Element UI 的 `.el-button` 是 inline-block，按钮内部按行盒排版；
+ * 触发按钮含箭头图标，图标用 vertical-align 对齐会超出文字行盒，把触发按钮顶得比
+ * 组内的 flex item 按钮高（Element Plus 的 `.el-button` 本身就是 inline-flex，故 vue3 端无此问题）。
+ * 这里与 vue3 端对齐改为行内弹性盒，并保持左侧直角与组内按钮衔接。
+ */
+.dscp-button-group .el-dropdown .el-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* 块级：撑满容器，直接按钮组与下拉触发等宽分摊 */
+.dscp-button-group--block {
+  display: flex;
+  width: 100%;
+}
+
+.dscp-button-group--block > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.dscp-button-group--block > .el-button-group,
+.dscp-button-group--block > .el-dropdown {
+  display: flex;
+}
+
+.dscp-button-group--block .el-button-group .el-button,
+.dscp-button-group--block .el-dropdown .el-button {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* 触发按钮内的箭头与文案基线对齐（Element UI 的图标是字体 class，没有 el-icon 容器） */
+.dscp-button-group .el-icon-arrow-down {
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/*
+ * 通用弹窗（DscpDialog）外观。
+ *
+ * 选择器统一收敛在 `.dscp-dialog` 下，避免影响宿主其他 el-dialog；
+ * 颜色 / 间距优先走 Design Token，缺省回退 Element Plus 变量。
+ */
+.dscp-dialog {
+  --dscp-dialog-body-max-height: 65vh;
+  --dscp-dialog-body-padding: 16px 20px;
+  --dscp-dialog-footer-gap: 8px;
+  --dscp-dialog-section-gap: 16px;
+}
+
+/* 垂直居中（Element UI 无 align-center 能力，用 wrapper flex + 去掉默认 margin-top） */
+.dscp-dialog-wrapper--align-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dscp-dialog-wrapper--align-center > .el-dialog {
+  margin: 0;
+}
+
+.dscp-dialog.el-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+}
+
+.dscp-dialog .el-dialog__header {
+  flex: none;
+  padding: 16px 20px 8px;
+  margin-right: 0;
+}
+
+.dscp-dialog__header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  padding-right: 24px;
+}
+
+.dscp-dialog__header__title {
+  min-width: 0;
+  color: var(--el-text-color-primary, #303133);
+  font-size: var(--dscp-font-size-medium, 16px);
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.dscp-dialog__header__subtitle {
+  margin-left: 6px;
+  color: var(--el-text-color-secondary, #909399);
+  font-size: var(--dscp-font-size-small, 13px);
+  font-weight: 400;
+}
+
+.dscp-dialog .el-dialog__body {
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+}
+
+.dscp-dialog__body {
+  box-sizing: border-box;
+  max-height: var(--dscp-dialog-body-max-height);
+  padding: var(--dscp-dialog-body-padding);
+  overflow-y: auto;
+}
+
+.dscp-dialog__section {
+  min-width: 0;
+  margin-bottom: var(--dscp-dialog-section-gap);
+}
+
+.dscp-dialog__section:last-child {
+  margin-bottom: 0;
+}
+
+.dscp-dialog__section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin-bottom: 8px;
+}
+
+/* 标题前的分组竖条：仅作装饰，不参与无障碍朗读 */
+.dscp-dialog__section-header::before {
+  content: '';
+  flex: none;
+  width: 3px;
+  height: 14px;
+  background: var(--dscp-color-primary, var(--el-color-primary, #409eff));
+  border-radius: 2px;
+}
+
+.dscp-dialog__section-title {
+  min-width: 0;
+  color: var(--el-text-color-primary, #303133);
+  font-size: var(--dscp-font-size-medium, 14px);
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.dscp-dialog__section-body {
+  min-width: 0;
+}
+
+.dscp-dialog .el-dialog__footer {
+  flex: none;
+  padding: 12px 20px;
+  border-top: 1px solid var(--el-border-color-lighter, #ebeef5);
+}
+
+.dscp-dialog__footer {
+  width: 100%;
+}
+
+.dscp-dialog__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--dscp-dialog-footer-gap);
+}
+
+@media screen and (max-width: 768px) {
+  .dscp-dialog.el-dialog {
+    width: calc(100% - 24px) !important;
+    max-width: calc(100% - 24px);
+    max-height: calc(100dvh - 32px);
+    margin: 16px auto;
+  }
+
+  .dscp-dialog .el-dialog__header {
+    padding: 14px 16px 6px;
+  }
+
+  .dscp-dialog__body {
+    padding: 12px 16px;
+  }
+
+  .dscp-dialog .el-dialog__footer {
+    padding: 10px 16px;
+  }
+}
+
+/* 栅格容器：列数由组件写入的 --card-list-columns 控制（缺省 4 列） */
+.dscp-card-list {
+  --card-list-gap: var(--dscp-space-md, 16px);
+
+  display: grid;
+  grid-template-columns: repeat(var(--card-list-columns, 4), minmax(0, 1fr));
+  gap: var(--card-list-gap);
+}
+
+/* 卡片：边框 + 内边距，等高分栏（grid 默认 stretch） */
+.dscp-card-list__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dscp-space-2xs, 4px);
+  min-width: 0;
+  padding: var(--dscp-space-md, 16px);
+  background: var(--dscp-color-surface, #fff);
+  border: 1px solid var(--dscp-color-border-lighter, #ebeef5);
+  border-radius: var(--dscp-border-radius, 4px);
+  transition:
+    border-color var(--dscp-duration-fast, 160ms) ease,
+    box-shadow var(--dscp-duration-fast, 160ms) ease;
+}
+
+/* 可选中形态：指针 + 悬停高亮；view 态（只读）保持默认光标与静态边框 */
+.dscp-card-list[data-dscp-type='normal'] .dscp-card-list__item {
+  cursor: pointer;
+}
+
+.dscp-card-list[data-dscp-type='normal'] .dscp-card-list__item:hover {
+  border-color: var(--dscp-color-primary-light-5, #a0cfff);
+}
+
+.dscp-card-list__item:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5, #a0cfff);
+  outline-offset: 2px;
+}
+
+/* 选中态：主题色边框 + 浅色底 */
+.dscp-card-list__item--selected,
+.dscp-card-list[data-dscp-type='normal'] .dscp-card-list__item--selected:hover {
+  background: var(--dscp-color-primary-light-9, #ecf5ff);
+  border-color: var(--dscp-color-primary, #409eff);
+}
+
+/* 标题行：色标 + 文案 + 问号提示同行，文案超出省略 */
+.dscp-card-list__label {
+  display: flex;
+  align-items: center;
+  gap: var(--dscp-space-2xs, 4px);
+  min-width: 0;
+  color: var(--dscp-color-text-regular, #606266);
+  font-size: var(--dscp-font-size-small, 13px);
+}
+
+.dscp-card-list__label-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 色标：小圆点，颜色由 markerColor 内联样式覆盖 */
+.dscp-card-list__marker {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--dscp-color-primary, #409eff);
+  border-radius: 50%;
+}
+
+/* 问号提示：聚焦可见，点击不触发卡片选中（渲染层已 stop 冒泡） */
+.dscp-card-list__tooltip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--dscp-color-text-placeholder, #c0c4cc);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  cursor: help;
+  border-radius: 50%;
+}
+
+.dscp-card-list__tooltip:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5, #a0cfff);
+  outline-offset: 1px;
+}
+
+/* 数值：主数值强调字号与字重 */
+.dscp-card-list__value {
+  overflow: hidden;
+  color: var(--dscp-color-text-primary, #303133);
+  font-weight: 600;
+  font-size: var(--dscp-font-size-extra-large, 20px);
+  line-height: 1.4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 描述：分段渲染时同行排布，bold 段加粗 */
+.dscp-card-list__description {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dscp-space-2xs, 4px);
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  line-height: 1.5;
+}
+
+.dscp-card-list__segment--bold {
+  color: var(--dscp-color-text-primary, #303133);
+  font-weight: 600;
+}
+
+/* ---------------------------------- 跑马灯 ---------------------------------- */
+
+/*
+ * 静态栅格（未开跑马灯）：视口 / 轨道 / 分组都不生成盒子（display: contents），
+ * 卡片直接进入根容器的 grid —— 与未跑马灯时的 DOM 布局完全一致。
+ */
+.dscp-card-list__viewport,
+.dscp-card-list__track,
+.dscp-card-list__group {
+  display: contents;
+}
+
+/* 跑马灯容器：改为定位父级，由视口负责裁切 */
+.dscp-card-list--marquee {
+  position: relative;
+  display: block;
+}
+
+.dscp-card-list--marquee .dscp-card-list__viewport {
+  display: block;
+  overflow: hidden;
+}
+
+/* 纵向：视口定高（由 --card-list-marquee-viewport 注入），横向按容器宽度铺满 */
+.dscp-card-list--marquee-y .dscp-card-list__viewport {
+  height: var(--card-list-marquee-viewport, 300px);
+}
+
+.dscp-card-list--marquee .dscp-card-list__track {
+  display: flex;
+  width: max-content;
+  /* 位移由渲染层写入内联 transform（rAF 自动滚动 / transition 翻页） */
+  will-change: transform;
+}
+
+.dscp-card-list--marquee-y .dscp-card-list__track {
+  flex-direction: column;
+  width: auto;
+}
+
+/* 分组：一组即「一份内容」，末尾补一个间距，保证两份首尾相接时刻度连续 */
+.dscp-card-list--marquee .dscp-card-list__group {
+  display: flex;
+  gap: var(--card-list-gap);
+  padding-right: var(--card-list-gap);
+}
+
+.dscp-card-list--marquee-y .dscp-card-list__group {
+  display: grid;
+  grid-template-columns: repeat(var(--card-list-columns, 4), minmax(0, 1fr));
+  padding-right: 0;
+  padding-bottom: var(--card-list-gap);
+}
+
+/* 横向：卡片定宽不换行，一屏展示几张由宽度决定（列数不适用） */
+.dscp-card-list--marquee-x .dscp-card-list__item {
+  flex: 0 0 var(--card-list-item-width, 220px);
+}
+
+/* 翻页按钮：默认隐藏，悬停 / 键盘聚焦时浮出（隐藏时不可点击） */
+.dscp-card-list__nav {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--dscp-color-text-regular, #606266);
+  font-size: var(--dscp-font-size-base, 14px);
+  background: var(--dscp-color-surface, #fff);
+  border: 1px solid var(--dscp-color-border-lighter, #ebeef5);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--dscp-duration-fast, 160ms) ease,
+    color var(--dscp-duration-fast, 160ms) ease;
+}
+
+.dscp-card-list--marquee:hover .dscp-card-list__nav,
+.dscp-card-list--marquee:focus-within .dscp-card-list__nav {
+  opacity: 1;
+  visibility: visible;
+}
+
+.dscp-card-list__nav:hover {
+  color: var(--dscp-color-primary, #409eff);
+}
+
+.dscp-card-list__nav:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5, #a0cfff);
+  outline-offset: 1px;
+}
+
+/* 横向：左右居中悬浮 */
+.dscp-card-list--marquee-x .dscp-card-list__nav--prev {
+  top: 50%;
+  left: 4px;
+  transform: translateY(-50%);
+}
+
+.dscp-card-list--marquee-x .dscp-card-list__nav--next {
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+}
+
+/* 纵向：上下居中悬浮，箭头旋转 90° 后指向上 / 下 */
+.dscp-card-list--marquee-y .dscp-card-list__nav {
+  left: 50%;
+}
+
+.dscp-card-list--marquee-y .dscp-card-list__nav--prev {
+  top: 4px;
+  transform: translateX(-50%);
+}
+
+.dscp-card-list--marquee-y .dscp-card-list__nav--next {
+  bottom: 4px;
+  transform: translateX(-50%);
+}
+
+.dscp-card-list--marquee-y .dscp-card-list__nav svg {
+  transform: rotate(90deg);
+}
+
+/* 纵向 + 文本字形兜底（宿主未注册 arrow-left / arrow-right 组件时）：同样需要旋转 90° */
+.dscp-card-list--marquee-y .dscp-card-list__nav span {
+  transform: rotate(90deg);
+}
+
+/* 窄屏（≤768px）：固定 2 列，避免 4 列挤压导致数值换行 */
+@media (max-width: 768px) {
+  .dscp-card-list,
+  .dscp-card-list--marquee-y .dscp-card-list__group {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.dscp-section {
+  --dscp-section-toggle-size: 24px;
+}
+
+.dscp-section__panel {
+  min-width: 0;
+}
+
+/* 头部：标题与切换按钮同行，标题位置由根 data-title-position 控制 */
+.dscp-section__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dscp-section[data-title-position='left'] .dscp-section__header {
+  flex-direction: row;
+}
+
+.dscp-section[data-title-position='right'] .dscp-section__header {
+  flex-direction: row-reverse;
+}
+
+/* 标题：超出省略，占满剩余空间 */
+.dscp-section__title {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 切换按钮：浮边框圆形按钮，置于头部行内 */
+.dscp-section__toggle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--dscp-section-toggle-size);
+  height: var(--dscp-section-toggle-size);
+  margin: 0;
+  padding: 0;
+  color: var(--el-text-color-regular, #606266);
+  background: var(--el-bg-color, #fff);
+  border: 1px solid var(--el-border-color, #dcdfe6);
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.dscp-section__toggle:hover {
+  color: var(--dscp-color-primary, #409eff);
+  border-color: var(--dscp-color-primary, #409eff);
+}
+
+.dscp-section__toggle:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5, #a0cfff);
+  outline-offset: 2px;
+}
+
+/* 切换图标：展开时朝下，收起时朝右（头部圆形按钮；图标可用 `toggle-icon` 插槽替换） */
+.dscp-section__toggle span {
+  display: inline-flex;
+  font-size: 14px;
+  line-height: 1;
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.dscp-section__toggle[aria-expanded='false'] span {
+  transform: rotate(0deg);
+}
+
+/* 内容体：v-show 保留表单态，仅做间距收敛 */
+.dscp-section__body {
+  min-width: 0;
+}
+
+/* 查询面板形态：与原 SearchTable 一致，内容整体收起，入口固定在卡片底边。 */
+.dscp-section[data-collapse-placement='footer'] {
+  overflow: visible;
+  border-radius: 8px;
+}
+
+.dscp-section[data-collapse-placement='footer'] > .el-card__body {
+  padding: 0;
+  overflow: visible;
+}
+
+.dscp-section[data-collapse-placement='footer'] .dscp-section__header {
+  min-height: 40px;
+  padding: 7px 14px;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--dscp-color-border, #dcdfe6);
+}
+
+.dscp-section[data-collapse-placement='footer'] .dscp-section__toggle-wrap {
+  display: flex;
+  position: relative;
+  z-index: 5;
+  height: 0;
+  justify-content: center;
+  border-top: 1px solid var(--dscp-color-primary, #409eff);
+}
+
+.dscp-section[data-collapse-placement='footer'] .dscp-section__toggle {
+  width: auto;
+  min-width: 54px;
+  height: 20px;
+  padding: 0 10px;
+  gap: 3px;
+  transform: translateY(-10px);
+  border: 0;
+  border-radius: 4px;
+  color: #fff;
+  background: var(--dscp-color-primary, #409eff);
+  box-shadow: 0 1px 2px rgb(37 99 235 / 25%);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+/*
+ * 胶囊形态（footer）：箭头改为**几何绘制**（两条边框 + 45° 旋转），不再用文字字形。
+ *
+ * 原实现是文字字形 `⌃`（U+2303）：墨迹整块位于基线上方（实测墨迹中心在基线上方 7px，
+ * 而「收起 / 展开」的中文墨迹中心在 4.5px）—— 展开态补 2.5px 位移勉强对齐，
+ * 但折叠态靠旋转 180° 切换，墨迹会翻到基线下侧，箭头掉到胶囊底部甚至溢出
+ *（20px 高的胶囊里特别明显）。两个状态各需不同补偿，且换字体即失效。
+ * 几何箭头没有「墨迹」概念，旋转只改朝向，两个状态都天然居中。
+ */
+.dscp-section[data-collapse-placement='footer'] .dscp-section__toggle span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 8px;
+  height: 8px;
+  transform: rotate(0deg);
+}
+
+/* 45° 后两条边框收成朝上的箭头；再各平移 1px 抵消边框厚度造成的视觉偏心 */
+.dscp-section[data-collapse-placement='footer'] .dscp-section__toggle span::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-top: 1.5px solid currentColor;
+  border-left: 1.5px solid currentColor;
+  transform: rotate(45deg) translate(1px, 1px);
+}
+
+.dscp-section[data-collapse-placement='footer'] .dscp-section__toggle[aria-expanded='false'] span {
+  transform: rotate(180deg);
+}
+
+/* 状态徽标：单行短状态文本。padding / 圆角 / 行高为设计稿固定规格，颜色走语义 token */
+.dscp-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 规格固定值（设计稿）：内边距 3px 7px、圆角 3px、行高 18px */
+  padding: 3px 7px;
+  border-radius: 3px;
+  background: var(--el-fill-color-light, #f5f7fa);
+  color: var(--dscp-color-info, #909399);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  font-weight: 700;
+  line-height: 18px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/*
+ * 语义类型：底色取 Element light-9 浅色调变量（随主题自动适配深色，
+ * 未注入主题时回退设计稿固定值）；文字色走已 token 化的语义色。
+ */
+.dscp-status-badge--primary {
+  background: var(--dscp-color-primary-light-9, #ecf5ff);
+  color: var(--dscp-color-primary, #409eff);
+}
+
+.dscp-status-badge--success {
+  background: var(--el-color-success-light-9, #f0f9eb);
+  color: var(--dscp-color-success, #67c23a);
+}
+
+.dscp-status-badge--warning {
+  background: var(--el-color-warning-light-9, #fdf6ec);
+  color: var(--dscp-color-warning, #e6a23c);
+}
+
+.dscp-status-badge--danger {
+  background: var(--el-color-danger-light-9, #fef0f0);
+  color: var(--dscp-color-danger, #f56c6c);
+}
+
+.dscp-status-badge--info {
+  background: var(--el-color-info-light-9, #f4f4f5);
+  color: var(--dscp-color-info, #909399);
+}
+
+/* 标签组：flex wrap 流式布局；expand 模式的折叠操作区绝对定位在容器右上角。 */
+.dscp-tags {
+  position: relative;
+  min-width: 0;
+}
+
+/* 收起态：右上角折叠交互区（popover 模式的 +N 触发器 / expand 模式的展开按钮 + 汇总标签）需要预留空间，避免遮住最后一项 */
+.dscp-tags--overflow {
+  padding-right: 44px;
+}
+
+.dscp-tags__list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--dscp-space-2xs, 4px);
+  min-width: 0;
+}
+
+/*
+ * 单个标签：占满可用宽度由内部 __label 省略（截断文案另有 Tooltip 全文兜底）；
+ * 未显式传 backgroundColor / textColor 时走组件级 token 默认色
+ * （双类名提升优先级，覆盖 el-tag 的 light 主题底色）。
+ *
+ * 浮窗内标签同样声明：浮层 append-to-body，不在 `.dscp-tags` 作用域内，
+ * 少了这一组选择器浮窗里的标签会退回 el-tag light 主题色。
+ */
+.dscp-tags .dscp-tags__item,
+.dscp-tags__floating .dscp-tags__item {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  margin-left: 0;
+  border: 0;
+  background-color: var(--dscp-tags-item-background, #eef2f7);
+  color: var(--dscp-tags-item-text, #475569);
+}
+
+/* 自定义文字色：关闭图标同步取文字色（el-tag 关闭图标有独立显式色，需覆盖） */
+.dscp-tags .dscp-tags__item--custom-text .el-tag__close,
+.dscp-tags__floating .dscp-tags__item--custom-text .el-tag__close {
+  color: inherit;
+}
+
+/*
+ * 移除中 / 禁用项（命中 loadingKeys）：整项置灰、关闭图标不可点击，
+ * 避免移除请求进行中被重复点击（组件侧同时拦截 delete 事件）。
+ */
+.dscp-tags .dscp-tags__item--loading,
+.dscp-tags__floating .dscp-tags__item--loading {
+  opacity: 0.6;
+}
+
+.dscp-tags .dscp-tags__item--loading .el-tag__close,
+.dscp-tags__floating .dscp-tags__item--loading .el-tag__close {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* 键盘焦点可见（标签本体可聚焦，Enter / Space 激活等同点击）。 */
+.dscp-tags .dscp-tags__item:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5, #a0cfff);
+  outline-offset: 1px;
+}
+
+.dscp-tags__label {
+  display: inline-block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+/* 空态占位：次要文字色，不占高度 */
+.dscp-tags__empty {
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+}
+
+/* 折叠交互区：绝对定位右上角，纵向排布
+   popover 模式的 +N 触发器 / expand 模式的展开按钮与 +N 汇总标签 */
+.dscp-tags__actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--dscp-gap-2xs, 4px);
+}
+
+/*
+ * 展开按钮：裸 button 重置默认样式，主色文字；
+ * hover / focus 走主色悬浮 token，focus-visible 外描边（无障碍可见焦点）。
+ */
+.dscp-tags__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  color: var(--dscp-color-primary, #409eff);
+  line-height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dscp-tags__toggle > span {
+  font-size: var(--dscp-font-size-base, 14px);
+}
+
+.dscp-tags__toggle:hover,
+.dscp-tags__toggle:focus {
+  color: var(--dscp-color-primary-hover, #66b1ff);
+}
+
+.dscp-tags__toggle:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5, #a0cfff);
+  outline-offset: 2px;
+}
+
+/* 汇总标签（expand 模式的 +N）：主色底 + 反白文字，作为 el-tag color 透传的兜底样式 */
+.dscp-tags .dscp-tags__summary {
+  justify-content: center;
+  min-width: 28px;
+  padding: 0 4px;
+  background-color: var(--dscp-color-primary, #409eff);
+  color: var(--dscp-color-surface, #ffffff);
+}
+
+/*
+ * +N 触发标签（overflowMode='popover'，默认）：浅底 + 主色文字 + 描边，
+ * 与列表内标签（浅灰底）区分，提示「还有 N 项」；悬停弹出浮窗。
+ * 双类名提升优先级，覆盖 el-tag light 主题底色。
+ */
+.dscp-tags .dscp-tags__trigger {
+  justify-content: center;
+  min-width: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--dscp-tags-trigger-border, #dcdfe6);
+  background-color: var(--dscp-tags-trigger-background, #ffffff);
+  color: var(--dscp-color-primary, #409eff);
+  cursor: pointer;
+}
+
+/* 键盘焦点可见（触发器可聚焦，读屏可听到「另有 N 项被收起」） */
+.dscp-tags .dscp-tags__trigger:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5, #a0cfff);
+  outline-offset: 1px;
+}
+
+/*
+ * 浮窗面板（popper-class 生成，append-to-body，故不带 `.dscp-tags` 作用域）：
+ * 宽度走组件库默认（贴合浮层内的标签，超长内容单行省略）；
+ * 仅兜底超窄视口，避免面板顶出屏幕。
+ */
+.dscp-tags__popover {
+  box-sizing: border-box;
+  max-width: calc(100vw - 32px);
+}
+
+/* 浮窗内容：纵向排列被收起的标签，超高滚动（隐藏项很多时不会撑满整屏） */
+.dscp-tags__floating {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dscp-space-2xs, 4px);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+/* 浮窗内标签：整行撑满、文案左对齐（长文案仍由 __label 省略） */
+.dscp-tags__floating .dscp-tags__floating-item {
+  box-sizing: border-box;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.dscp-text-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* 内容区：title 挂全文本，超长时单行省略（min-width 归零才能被 flex 压缩出省略号） */
+.dscp-text-copy__content {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 复制按钮：原生 button 复位，仅保留主题色与点击态 */
+.dscp-text-copy__button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  color: var(--dscp-color-primary, #409eff);
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.dscp-text-copy__button:hover {
+  opacity: 0.75;
+}
+
+.dscp-text-copy__button:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5, #a0cfff);
+  outline-offset: 2px;
+}
+
+.dscp-batch-search-input {
+  width: 100%;
+}
+
+.dscp-batch-search-input__label {
+  margin: 0 0 8px;
+  color: var(--dscp-color-text-regular, #606266);
+  font-size: 14px;
+}
+
+.dscp-batch-search-input__tip {
+  margin: 8px 0 0;
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.dscp-bulk-search {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+}
+
+.dscp-bulk-search__selector {
+  min-width: 0;
+}
+
+.dscp-bulk-search__control {
+  min-width: 0;
+  flex: 1;
+}
+
+/*
+ * 左侧下拉模拟输入组 prepend 观感：灰底 + 去右圆角。
+ *
+ * 本文件是全局样式（经 index.ts 引入，非 scoped），不得写 `:deep()`——它只在 SFC
+ * `<style scoped>` 内有效，写在这里会被浏览器当作未知伪类丢弃，整条规则静默失效。
+ * Element 类穿透（唯一允许处）一律限定在本组件前缀作用域内。
+ *
+ * 另注意 Vue 2 端 Element UI 的下拉可视框是 `.el-select > .el-input > input.el-input__inner`
+ * （没有 Element Plus 2.x 的 `.el-select__wrapper` 中层），选择器须按此 DOM 书写。
+ */
+.dscp-bulk-search__selector > .el-input > .el-input__inner {
+  border-radius: 4px 0 0 4px;
+  background-color: var(--el-fill-color-light, #f5f7fa);
+  color: var(--dscp-color-text-regular, #606266);
+}
+
+/*
+ * 右侧控件去左圆角拼合，接缝只留下拉的右边框。
+ *
+ * 三种形态的输入框都在本控件作用域内（输入框 `.el-input__inner`、下拉同构、
+ * 批量输入 `.dscp-batch-search-input` 内层 el-input）；批量输入弹窗 `append-to-body`
+ * 挂到 body，不会误伤。
+ */
+.dscp-bulk-search__control .el-input__inner {
+  border-left: 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.dscp-custom-form {
+  width: 100%;
+}
+
+.dscp-custom-form__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--custom-form-columns, 7), minmax(0, 1fr));
+  align-items: start;
+}
+
+.dscp-custom-form__item {
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.dscp-custom-form__item--quick-filter {
+  align-self: end;
+}
+
+.dscp-custom-form__label-text {
+  display: inline;
+}
+
+/* 只读标识：锁图标 + 文案，颜色走 token（商户端主题可覆盖） */
+.dscp-custom-form__readonly-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  color: var(--dscp-form-readonly-tag, var(--dscp-color-text-placeholder, #a8abb2));
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.dscp-custom-form__readonly-tag .el-icon-lock {
+  font-size: 12px;
+  line-height: 1;
+  color: inherit;
+}
+
+/*
+ * 错误文案（`.el-form-item__error`）在 Element 里是 `position: absolute; top: 100%`，**不占流**；
+ * 本组件又把 `.el-form-item` 的 `margin-bottom` 置 0、行距只由栅格 gap 提供，
+ * 于是文案会悬在下一行上被盖住。这里让出错项主动让出错误带（`inline` 形态）：
+ * - 正常态零变化（未出错的项不加内边距，布局与原来一致）；
+ * - 错误态文案落在自己让出的空间里（高度与 core 的行高估算一致，虚拟滚动不会因此抖动）；
+ * - `z-index` 兜底：文案超长折行、超出错误带时仍绘制在后续行之上，不被压住。
+ *
+ * 注：`.el-*` 为 Element 的类名，属于对第三方内部结构的依赖（Element / Element Plus 大版本升级需复核）。
+ */
+.dscp-custom-form__item.is-error {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 18px;
+}
+
+/*
+ * 错误态 label 标红：Element 的 `is-error` 只标红控件边框与图标，label 需组件自行处理，
+ * 否则「哪一项出错」的指示偏弱。两种错误展示形态下都生效。
+ */
+.dscp-custom-form__item.is-error .el-form-item__label {
+  color: var(--el-color-danger, #f56c6c);
+}
+
+/*
+ * `popover` 形态（`errorDisplay="popover"`）：控件下方不出现常驻文案，
+ * 鼠标悬停 / 焦点进入错误项时才以浮层弹出。
+ * - 不占行高：`padding-bottom` 归零，错误态也不会改变行高（虚拟滚动几何恒定）；
+ * - 用 `opacity` 而非 `display` 隐藏，保留无障碍树（屏幕阅读器仍能读到错误文案）；
+ * - 浮层带背景与阴影，靠上面的 `z-index` 绘制在后续行之上。
+ * 选择器多带一个类，特异性高于 `inline` 规则，不依赖书写顺序。
+ */
+.dscp-custom-form__item.is-error.dscp-custom-form__item--error-popover {
+  padding-bottom: 0;
+}
+
+.dscp-custom-form__item--error-popover .el-form-item__error {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--el-transition-duration-fast, 0.2s);
+}
+
+.dscp-custom-form__item--error-popover.is-error:hover .el-form-item__error,
+.dscp-custom-form__item--error-popover.is-error:focus-within .el-form-item__error {
+  opacity: 1;
+  pointer-events: auto;
+  max-width: 240px;
+  padding: 2px 8px 3px;
+  border-radius: 4px;
+  background: var(--el-color-danger-light-9, #fef0f0);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+  line-height: 1.4;
+}
+
+.dscp-custom-form__label-tip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+  border: 1px solid var(--dscp-color-border, #dcdfe6);
+  border-radius: 50%;
+  color: var(--dscp-color-text-placeholder, #a8abb2);
+  font-size: 12px;
+  line-height: 1;
+  cursor: help;
+}
+
+.dscp-custom-form__group {
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--dscp-color-border, #dcdfe6);
+  border-radius: 4px;
+}
+
+.dscp-custom-form__group__title {
+  padding: 0 4px;
+  font-weight: 600;
+}
+
+.dscp-custom-form__group__description {
+  margin: 0 0 8px;
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: 12px;
+}
+
+.dscp-custom-form__group__head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 24px;
+}
+
+.dscp-custom-form__group__toggle {
+  padding: 0 4px;
+  border: none;
+  background: transparent;
+  color: var(--dscp-color-text-regular, #606266);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.dscp-custom-form__group-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--custom-form-columns, 7), minmax(0, 1fr));
+  align-items: start;
+}
+
+/* 虚拟滚动：定高滚动容器 + 行块窗口化挂载（屏外行由全量 descriptor 校验兜底） */
+.dscp-custom-form__virtual {
+  width: 100%;
+  overflow: auto;
+}
+
+.dscp-custom-form__virtual-row {
+  display: grid;
+  grid-template-columns: repeat(var(--custom-form-columns, 7), minmax(0, 1fr));
+  align-items: start;
+  /* 行高锁定到 core 的估算值：实际几何与滚动几何一致，滚动时窗口才不漂移 */
+  min-height: var(--custom-form-virtual-row-height, 60px);
+}
+
+/*
+ * 分组块是整块成行的，组内网格行高同样锁定，
+ * 使其实际高度贴合 core 按「组头 + 组内折行行数」推算的高度。
+ */
+.dscp-custom-form__virtual-row .dscp-custom-form__group-grid {
+  grid-auto-rows: minmax(var(--custom-form-virtual-row-height, 60px), auto);
+}
+
+/* content-visibility：仅显式开启时对屏外表单项跳过布局与绘制（不减 DOM 与 patch）。 */
+.dscp-custom-form--cv .dscp-custom-form__grid > *,
+.dscp-custom-form--cv .dscp-custom-form__group-grid > * {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 56px;
+}
+
+/*
+ * 自定义选择器：全局样式（下拉与 Popover 都挂到 body，故不使用 scoped）。
+ *
+ * Element 类穿透（唯一允许处）一律限定在本组件前缀作用域内；两端 Element 的类名一致
+ * （`el-select-dropdown__item` / `el-checkbox__input` / `el-tag` …），故按 vue3 端同一套选择器书写。
+ */
+.dscp-custom-select__reference {
+  display: inline-block;
+  width: 100%;
+}
+
+/*
+ * 全选行：复用 Element 下拉项基类（唯一一处，保内容区字号/行高与选项一致），
+ * 本组件前缀类只补布局与分隔线，不覆盖 Element 内部状态样式。
+ */
+.dscp-custom-select__select-all.el-select-dropdown__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dscp-space-sm, 12px);
+  border-bottom: 1px solid var(--dscp-color-border, #dcdfe6);
+  background: var(--dscp-color-surface, #fff);
+}
+
+.dscp-custom-select__select-all.el-select-dropdown__item .el-checkbox {
+  vertical-align: middle;
+}
+
+.dscp-custom-select__select-all.el-select-dropdown__item .el-checkbox__input {
+  transform: translateY(-1px);
+}
+
+.dscp-custom-select__select-all.el-select-dropdown__item .el-checkbox__label {
+  padding-left: 6px;
+}
+
+.dscp-custom-select__selected-popover {
+  box-sizing: border-box;
+  max-width: calc(100vw - 32px);
+}
+
+.dscp-custom-select__selected-tags {
+  display: flex;
+  max-height: 240px;
+  flex-wrap: wrap;
+  gap: var(--dscp-space-2xs, 4px);
+  overflow-y: auto;
+}
+
+.dscp-custom-select__selected-tags .el-tag {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  align-items: center;
+  margin-left: 0;
+}
+
+.dscp-custom-select__selected-tags .el-tag .el-tag__close {
+  flex: none;
+  margin-left: auto;
+}
+
+.dscp-custom-select__select-all-hint {
+  overflow: hidden;
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  font-weight: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dscp-custom-select__selected-tag-label {
+  display: block;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * 虚拟承载容器：类名与渲染器 `createCustomSelectClass(prefix, 'selected-tags-virtual')`
+ * 生成的一致（此前写成 `--virtual` 导致这两条规则从未生效，两端同步修正）。
+ */
+.dscp-custom-select__selected-tags-virtual {
+  display: block;
+  height: 240px;
+}
+
+.dscp-custom-select__selected-tags-virtual .el-tag {
+  margin-bottom: var(--dscp-space-2xs, 4px);
+}
+
+/* ---------- 折叠标签单行布局 ---------- */
+/*
+ * 列宽不足时 Element UI 默认允许标签换行，会把「首个标签」和「+N」拆到两行。
+ * 这里固定单行：首个标签按剩余宽度省略，+N 固定保留。
+ */
+.dscp-custom-select__reference .el-select__tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.dscp-custom-select__reference .el-select__tags > span {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.dscp-custom-select__reference .el-select__tags > span > .el-tag:first-child {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.dscp-custom-select__reference .el-select__tags > span > .el-tag:not(:first-child) {
+  flex: none;
+}
+
+.dscp-custom-select__reference .el-select__tags > span > .el-tag:first-child .el-select__tags-text {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dscp-custom-select__reference .el-select__tags > span > .el-tag:first-child .el-tag__close {
+  flex: none;
+}
+
+.dscp-custom-select__reference .el-select__input {
+  flex: 1 1 20px;
+  min-width: 20px;
+}
+
+/* 远程加载：保持下拉原有尺寸，用遮罩和 spinner 替代内容闪动 */
+.dscp-custom-select__reference .el-select {
+  width: 100%;
+}
+
+.dscp-custom-select__popper--loading .el-select-dropdown {
+  position: relative;
+}
+
+.dscp-custom-select__popper--loading.el-select-dropdown::after,
+.dscp-custom-select__popper--loading .el-select-dropdown::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.dscp-custom-select__popper--loading.el-select-dropdown::before,
+.dscp-custom-select__popper--loading .el-select-dropdown::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  width: 20px;
+  height: 20px;
+  margin: -12px 0 0 -12px;
+  border: 2px solid var(--dscp-color-border, #dcdfe6);
+  border-top-color: var(--dscp-color-primary, #409eff);
+  border-radius: 50%;
+  animation: dscp-custom-select-loading-spin 0.8s linear infinite;
+}
+
+.dscp-custom-select__popper--loading .el-select-dropdown__empty {
+  min-width: 120px;
+  min-height: 100px;
+  color: transparent;
+}
+
+@keyframes dscp-custom-select-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/*
+ * 文件导入上传：全局样式（结果弹窗 `append-to-body` 挂到 body，故不使用 scoped）。
+ * 全部类名由 createFileImportUploadClass 生成，避免微前端下的裸类名冲突；
+ * 语义色走 token，中性底 / 错误底取 Element 浅色调变量（随主题适配，
+ * 未注入时回退设计稿固定值）；错误描边为一次性装饰常量，暂不 token 化。
+ */
+.dscp-file-import-upload__control {
+  width: 100%;
+}
+
+.dscp-file-import-upload__summary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.dscp-file-import-upload__summary-item {
+  display: flex;
+  min-width: 150px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--dscp-color-border-lighter, #ebeef5);
+  border-radius: var(--dscp-border-radius, 4px);
+  background: var(--el-fill-color-lighter, #fafafa);
+  font-size: var(--dscp-font-size-base, 14px);
+  font-weight: 600;
+
+  &.is-success {
+    color: var(--dscp-color-success, #67c23a);
+  }
+
+  &.is-error {
+    color: var(--dscp-color-danger, #f56c6c);
+  }
+}
+
+.dscp-file-import-upload__prompt {
+  margin-bottom: 16px;
+}
+
+.dscp-file-import-upload__section {
+  margin-top: 16px;
+
+  h4 {
+    margin: 0 0 8px;
+    color: var(--dscp-color-text-primary, #303133);
+    font-size: var(--dscp-font-size-base, 14px);
+  }
+}
+
+.dscp-file-import-upload__detail-list {
+  max-height: 240px;
+  padding: 8px 12px;
+  overflow-y: auto;
+  border: 1px solid #fbc4c4;
+  border-radius: var(--dscp-border-radius, 4px);
+  background: var(--el-color-danger-light-9, #fef0f0);
+}
+
+.dscp-file-import-upload__detail {
+  color: var(--dscp-color-danger, #f56c6c);
+  line-height: 24px;
+  word-break: break-word;
+}
+
+.dscp-file-import-upload__duplicate-list {
+  display: flex;
+  max-height: 120px;
+  flex-wrap: wrap;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .dscp-file-import-upload__summary {
+    flex-direction: column;
+  }
+}
+
+/*
+ * 图片搜索输入（DscpImageSearch，Vue 2 / Element UI）样式。
+ *
+ * 本文件是全局样式（经 index.ts 引入，非 scoped），不得写 `:deep()`——
+ * 它只在 SFC `<style scoped>` 内有效，写在这里会被浏览器当作未知伪类丢弃，整条规则静默失效。
+ * Element 类穿透（唯一允许处）一律限定在本组件前缀作用域内。
+ */
+
+.dscp-image-search {
+  width: 100%;
+}
+
+/*
+ * 缩略图垂直居中：
+ * `.el-input__prefix` 是绝对定位 + height:100% + text-align:center 的行盒，
+ * 里面的 inline-flex 缩略图按基线对齐会贴着输入框上沿（还会溢出上边框），
+ * 把 prefix 改成 flex 纵向居中后，缩略图才真正落在输入框中间。
+ */
+.dscp-image-search .el-input__prefix {
+  display: flex;
+  align-items: center;
+}
+
+/* 输入框内的图片缩略图：随输入框排版，不脱离文档流（不会压住查询区其它行）。 */
+.dscp-image-search__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 4px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.dscp-image-search__chip-inner {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dscp-image-search__thumb {
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+/* 移除按钮：绝对定位在缩略图右上角，红色叉号 + 白底保证在任何底色上可辨识。 */
+.dscp-image-search__chip-close {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 1;
+  padding: 1px;
+  color: var(--dscp-color-danger, #f56c6c);
+  font-size: 14px;
+  line-height: 1;
+  background-color: var(--dscp-color-surface, #fff);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* 键盘聚焦时给出可见焦点环（移除按钮是原生 button，可聚焦）。 */
+.dscp-image-search__chip-close:focus-visible {
+  outline: 2px solid var(--dscp-color-primary, #409eff);
+  outline-offset: 1px;
+}
+
+/*
+ * 悬停放大的预览图：popover 挂到 body（append-to-body），不在本组件的 DOM 子树内，
+ * 故样式以 popper 自身的类名限定作用域。
+ */
+.dscp-image-search__popper.el-popover {
+  height: auto;
+  padding: 6px;
+}
+
+.dscp-image-search__preview {
+  display: block;
+  width: 180px;
+  height: 180px;
+}
+
+/*
+ * 粘贴表格：全局样式（类名由 createPasteTableClass 生成，构建时按 stylePrefix 重写）。
+ * 语义色 / 间距走 Design Token，未注入时回退设计稿固定值；
+ * 卡片阴影为一次性装饰常量，暂不 token 化。
+ */
+.dscp-paste-table {
+  box-sizing: border-box;
+}
+
+.dscp-paste-table.is-bordered {
+  padding: 20px;
+  border-radius: 10px;
+  background: var(--dscp-color-surface, #fff);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 8%);
+}
+
+.dscp-paste-table__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.dscp-paste-table__title {
+  padding-left: 10px;
+  border-left: 4px solid var(--dscp-color-primary, #409eff);
+  color: var(--dscp-color-text-primary, #303133);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.dscp-paste-table__tip {
+  margin: 0 0 10px;
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: var(--dscp-font-size-small, 13px);
+}
+
+.dscp-paste-table__tip-highlight {
+  color: var(--dscp-color-danger, #f56c6c);
+  font-weight: 700;
+}
+
+.dscp-paste-table__input {
+  width: 100%;
+}
+
+.dscp-paste-table__input .el-textarea__inner {
+  border: 1px solid var(--dscp-color-border, #dcdfe6);
+  border-radius: var(--dscp-border-radius, 8px);
+}
+
+.dscp-paste-table__input .el-textarea__inner:focus {
+  border-color: var(--dscp-color-primary, #409eff);
+}
+
+.dscp-paste-table__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.dscp-paste-table__result {
+  margin-top: 20px;
+}
+
+.dscp-paste-table__stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  color: var(--dscp-color-text-regular, #606266);
+  font-size: var(--dscp-font-size-small, 13px);
+}
+
+.dscp-paste-table__totals {
+  color: var(--dscp-color-warning, #e6a23c);
+}
+
+.dscp-paste-table__total-item {
+  margin-left: 16px;
+}
+
+.dscp-paste-table__pagination {
+  margin-top: 12px;
+  text-align: right;
+}
+
+.dscp-quick-filter {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dscp-space-xs, 8px);
+  width: 100%;
+  color: var(--dscp-color-text-primary, #303133);
+  font-size: var(--dscp-font-size-base, 14px);
+}
+
+.dscp-quick-filter__label {
+  flex-shrink: 0;
+  color: var(--dscp-color-text-regular, #606266);
+  font-size: var(--dscp-font-size-base, 14px);
+  line-height: var(--dscp-control-height-small, 28px);
+  white-space: nowrap;
+}
+
+.dscp-quick-filter__divider {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 1px;
+  background-color: var(--dscp-color-border-lighter, #ebeef5);
+}
+
+.dscp-quick-filter__content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 维护弹窗内容作用域：dialog 使用 append-to-body，内部样式以 __dialog 为作用域 */
+.dscp-tag-editor {
+  display: inline-block;
+}
+
+/* 标签搜索框：置于标签列表上方 */
+.dscp-tag-editor__dialog .dscp-tag-editor__search {
+  margin-bottom: 8px;
+}
+
+.dscp-tag-editor__dialog .dscp-tag-editor__list {
+  max-height: 320px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+/* 名称输入框网格：五列布局（列数由 columns 属性决定） */
+.dscp-tag-editor__dialog .dscp-tag-editor__grid {
+  display: grid;
+  gap: var(--dscp-space-2xs, 4px) var(--dscp-space-xs, 8px);
+}
+
+/* 单个标签项：输入框 + 删除图标（关闭图标定位到输入框右侧） */
+.dscp-tag-editor__dialog .dscp-tag-editor__draft {
+  position: relative;
+  min-width: 0;
+}
+
+.dscp-tag-editor__dialog .dscp-tag-editor__draftInput {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 4px 20px 4px 8px;
+  border: 1px solid var(--dscp-color-border, #dcdfe6);
+  border-radius: var(--dscp-border-radius-base, 4px);
+  background-color: var(--dscp-color-white, #fff);
+  color: var(--dscp-color-text-primary, #303133);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  line-height: 1.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dscp-tag-editor__dialog .dscp-tag-editor__draftInput:focus {
+  outline: none;
+  border-color: var(--dscp-color-primary, #409eff);
+}
+
+.dscp-tag-editor__dialog .dscp-tag-editor__draftInput:disabled {
+  cursor: not-allowed;
+  background-color: var(--dscp-color-fill-lighter, #f5f7fa);
+}
+
+.dscp-tag-editor__dialog .dscp-tag-editor__draftClose {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dscp-tag-editor__dialog .dscp-tag-editor__draftClose:hover {
+  color: var(--dscp-color-danger, #f56c6c);
+}
+
+.dscp-tag-editor__dialog .dscp-tag-editor__draftClose:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5, #a0cfff);
+  outline-offset: 1px;
+}
+
+/* 空态占位 */
+.dscp-tag-editor__dialog .dscp-tag-editor__empty {
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+}
+
+/* 底部按钮区：右对齐 */
+.dscp-tag-editor__dialog .dscp-tag-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--dscp-space-xs, 8px);
+}
+
+/* 触发入口：内联块，与列表操作区其他按钮同排 */
+.dscp-tag-selector {
+  display: inline-block;
+}
+
+/*
+ * 弹窗内容作用域：dialog 使用 append-to-body（内容移到 body 下），
+ * 故内部样式一律以 __dialog 为作用域，不能依赖根元素祖先选择器。
+ */
+.dscp-tag-selector__dialog .dscp-tag-selector__tip {
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  border-radius: var(--dscp-border-radius-base, 4px);
+  background-color: var(--dscp-color-primary-light-9, #ecf5ff);
+  color: var(--dscp-color-text-regular, #606266);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  line-height: 1.6;
+}
+
+/* 系统标签作用说明：次要文字色，与主提示条区分层级 */
+.dscp-tag-selector__dialog .dscp-tag-selector__systemTip {
+  margin: 0 0 12px;
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  line-height: 1.6;
+}
+
+/* 工具栏：已选范围提示居左、操作方式下拉居右（同一行） */
+.dscp-tag-selector__dialog .dscp-tag-selector__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--dscp-space-xs, 8px);
+  margin-bottom: 12px;
+}
+
+/* 已选范围：业务侧传入的统计文案（工具栏左侧） */
+.dscp-tag-selector__dialog .dscp-tag-selector__summary {
+  margin: 0;
+  color: var(--dscp-color-text-primary, #303133);
+  font-size: var(--dscp-font-size-base, 14px);
+}
+
+/* 操作方式：去掉 label 只留下拉，贴工具栏右侧（未传已选文案时也靠右） */
+.dscp-tag-selector__dialog .dscp-tag-selector__action {
+  flex: none;
+  width: 140px;
+  margin-left: auto;
+}
+
+/* 标签搜索框：工具栏中部弹性伸展（无已选文案时与下拉一起靠右） */
+.dscp-tag-selector__dialog .dscp-tag-selector__search {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 「移除全部标签」收敛区提示：与顶部规则提示区分层级，弱化突出警示语义 */
+.dscp-tag-selector__dialog .dscp-tag-selector__skipHint {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-radius: var(--dscp-border-radius-base, 4px);
+  background-color: var(--dscp-color-warning-light-9, #fdf6ec);
+  color: var(--dscp-color-warning-dark-2, #b88230);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  line-height: 1.6;
+}
+
+/* 页签行：左页签、右批量入口，底部细分隔线 */
+.dscp-tag-selector__dialog .dscp-tag-selector__tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--dscp-space-md, 16px);
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--dscp-color-border-light, #ebeef5);
+}
+
+/* 页签：裸 button 重置默认样式，选中态主色文字 + 底部主色指示条 */
+.dscp-tag-selector__dialog .dscp-tag-selector__tab {
+  position: relative;
+  padding: 6px 0;
+  border: 0;
+  color: var(--dscp-color-text-regular, #606266);
+  font-size: var(--dscp-font-size-base, 14px);
+  background: transparent;
+  cursor: pointer;
+}
+
+.dscp-tag-selector__dialog .dscp-tag-selector__tab:hover {
+  color: var(--dscp-color-primary, #409eff);
+}
+
+.dscp-tag-selector__dialog .dscp-tag-selector__tab--active {
+  color: var(--dscp-color-primary, #409eff);
+  font-weight: 600;
+}
+
+.dscp-tag-selector__dialog .dscp-tag-selector__tab--active::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  background-color: var(--dscp-color-primary, #409eff);
+  content: '';
+}
+
+.dscp-tag-selector__dialog .dscp-tag-selector__tab:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5, #a0cfff);
+  outline-offset: 2px;
+}
+
+/* 批量入口（全选 / 反选 / 清空）：靠右，只作用于当前页签可见标签 */
+.dscp-tag-selector__dialog .dscp-tag-selector__bulk {
+  display: flex;
+  align-items: center;
+  gap: var(--dscp-space-2xs, 4px);
+  margin-left: auto;
+  margin-bottom: 2px;
+}
+
+/* 全部选中时高亮「全选」入口（当前可见标签已无未选项） */
+.dscp-tag-selector__dialog .dscp-tag-selector__bulk--all-selected {
+  opacity: 0.6;
+}
+
+/* 分组：标题左侧蓝色短线标识 */
+.dscp-tag-selector__dialog .dscp-tag-selector__group {
+  margin-bottom: 12px;
+}
+
+.dscp-tag-selector__dialog .dscp-tag-selector__groupTitle {
+  display: flex;
+  align-items: center;
+  margin: 0 0 8px;
+  font-size: var(--dscp-font-size-base, 14px);
+  color: var(--dscp-color-text-primary, #303133);
+}
+
+.dscp-tag-selector__dialog .dscp-tag-selector__groupTitle::before {
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  margin-right: 6px;
+  background-color: var(--dscp-color-primary, #409eff);
+  content: '';
+}
+
+/* 复选框网格：五列布局（列数由 columns 属性决定），内容过多时组内滚动 */
+.dscp-tag-selector__dialog .dscp-tag-selector__grid {
+  display: grid;
+  gap: var(--dscp-space-2xs, 4px) var(--dscp-space-xs, 8px);
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+/*
+ * 单个标签复选框：flex 垂直居中 + 文案过长省略。
+ *
+ * 必须用 flex 而非默认的 inline-block 基线对齐：`__label` 为做省略号加了
+ * `overflow: hidden`，这会让 inline-block 的基线改为元素底边，文字与复选框方块错位。
+ */
+.dscp-tag-selector__dialog .dscp-tag-selector__tag {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin-right: 0;
+}
+
+.dscp-tag-selector__dialog .dscp-tag-selector__tag .el-checkbox__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 分组空态 */
+.dscp-tag-selector__dialog .dscp-tag-selector__empty {
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+}
+
+/*
+ * 底部操作区：整体右对齐（`flex-end`），维护入口以 `margin-right: auto` 顶到最左。
+ * 这样维护入口隐藏时（`showMaintain=false` 或「移除全部标签」），取消 / 确定仍贴右，
+ * 不会因左侧元素消失而整体左移。
+ */
+.dscp-tag-selector__dialog .dscp-tag-selector__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--dscp-space-xs, 8px);
+}
+
+.dscp-tag-selector__dialog .dscp-tag-selector__maintain {
+  margin-right: auto;
+}
+
+/* DscpLayout 全局样式（非 scoped 部分） */
+
+/* 主容器与侧边栏联动。
+   本组件为 PC 端布局：sidebar 浮动左侧固定宽度，main 用 margin-left 让位。
+   hide-sidebar 时 sidebar 容器也同步收缩到 64px，让内部 el-menu--collapse 的
+   64px 标准宽度与容器对齐，菜单项 icon (24px+text-align:center) 才能视觉居中。 */
+.dscp-app-wrapper .dscp-main-container {
+  margin-left: 150px;
+  transition: margin-left 0.28s;
+}
+.dscp-app-wrapper.hide-sidebar .dscp-main-container {
+  margin-left: 64px;
+}
+.dscp-app-wrapper.hide-sidebar .dscp-sidebar {
+  width: 64px !important;
+}
+.dscp-app-wrapper.without-sidebar .dscp-main-container,
+.dscp-main-container.without-sidebar {
+  margin-left: 0;
+  width: 100%;
+}
+
+/* 内部结构样式挂在稳定的 data 属性作用域下，外部可见类名由 stylePrefix 契约生成 */
+[data-dscp-component='scrollbar'] {
+  position: relative;
+  min-height: 0;
+}
+
+[data-dscp-component='scrollbar'] .scrollbar-viewport {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+[data-dscp-component='scrollbar'] .scrollbar-viewport::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+[data-dscp-component='scrollbar'] .scrollbar-track {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 4px;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+[data-dscp-component='scrollbar']:hover .scrollbar-track,
+[data-dscp-component='scrollbar']:focus-within .scrollbar-track {
+  opacity: 1;
+}
+
+[data-dscp-component='scrollbar'] .scrollbar-thumb {
+  width: 4px;
+  background: rgba(144, 147, 153, 0.45);
+  border-radius: 2px;
+  cursor: grab;
+}
+
+[data-dscp-component='scrollbar'] .scrollbar-thumb:hover {
+  background: rgba(144, 147, 153, 0.7);
+}
+
+[data-dscp-component='scrollbar'] .scrollbar-thumb:active {
+  cursor: grabbing;
+}
+
+/*
+ * DscpCustomTable 样式（Vue 2 / Element UI 版）。
+ *
+ * 与 vue3 端同源（`packages/vue3/src/table/custom-table/style.css`），差异集中在三处：
+ * 1. **没有 `ElTableV2`**：vue3 里那套 `--virtual` 容器与 `*-table-v2__*` 外观全部不适用
+ *    （Vue 2 端虚拟滚动只有「滚动切片」策略，保留 `ElTable` 原生外观）；
+ * 2. **不写 `--el-*` 兜底**：Element UI 2.x 没有 CSS 变量主题层，配色一律走 `--dscp-*` token
+ *    （带字面量兜底），主题切换由 token 层负责；
+ * 3. **表头拖拽是原生 DnD**：没有第三方拖拽器的 `dscp-drag-wrapper` 覆盖层 / `data-drag-state`
+ *    状态类，落点线是自己渲染的 `__drag-indicator`，被拖列高亮由列样式表下发。
+ *
+ * 命名一律带业务前缀（微前端不做 CSS 隔离，裸类名会互相命中）；`is-*` 为 Element 状态类。
+ * 不做 scoped：表格是插槽容器，宿主内容与 Element UI 内部 DOM 都在同一棵树里。
+ */
+
+/* 根容器：铺满父级宽度，全屏态改为纵向 flex 撑满视口 */
+.dscp-custom-table {
+  /* 定位上下文：列设置悬浮入口 / 外置按钮列 / 拖拽落点线都用 absolute */
+  position: relative;
+  width: 100%;
+}
+
+/* ---------- 滚动切片虚拟滚动（virtualScrollProps.strategy: 'slice'） ----------
+   保留 `ElTable` 原生外观与固定列能力，样式层只配合「窗口化」做两件事：
+   1. 视口高度交给 `ElTable` 的 height / max-height（见 resolveSliceViewportSize），
+      容器不强制高度，避免容器与表格自身高度不一致；
+   2. 滚动内容容器（Element UI 为 `.el-table__body-wrapper`，若宿主换成滚动条组件
+      则可能是 `*-scrollbar__view`）的上下占位由组件内联写入 ——
+      这里只兜底解除可能存在的固定高度约束。 */
+.dscp-custom-table--slice {
+  width: 100%;
+}
+
+.dscp-custom-table--slice [class*='-scrollbar__view'],
+.dscp-custom-table--slice .el-table__body-wrapper {
+  height: auto;
+}
+
+/* ---------- 固定行（行数据 fixed: 'top' | 'bottom'） ----------
+   列 fixed 是左右吸边，固定行是上下吸边：把两端固定行的单元格设为 sticky，
+   偏移由组件按实测行高逐个下发（`--dscp-custom-table-fixed-offset`），
+   因此多个固定行依次错开、互不重叠。
+
+   四个约束：
+   1. sticky 必须落在 `td` 上（固定列同样作用于 `td`，`tr` 不支持），偏移经 CSS 变量继承；
+   2. 选择器必须带上单元格类（`.el-table__cell`）：Element UI 的 `.el-table td` 已声明
+      边框与 `position`，权重相同或更低时会被整条盖掉；用属性子串匹配避免写死命名空间；
+   3. 固定行单元格必须有**不透明底色**，否则滚动内容会透出来；
+   4. z-index 压在普通行之上；固定列 × 固定行的交叉单元格双向吸边，再抬高一档。 */
+.dscp-custom-table--fixed-row-top > td[class*='-table__cell'],
+.dscp-custom-table--fixed-row-bottom > td[class*='-table__cell'] {
+  position: sticky;
+  z-index: 2;
+  background-color: var(--dscp-table-row-bg-color, #fff);
+}
+
+.dscp-custom-table--fixed-row-top > td[class*='-table__cell'] {
+  top: var(--dscp-custom-table-fixed-offset, 0px);
+  box-shadow: inset 0 -1px 0 var(--dscp-table-border-color, #ebeef5);
+}
+
+.dscp-custom-table--fixed-row-bottom > td[class*='-table__cell'] {
+  bottom: var(--dscp-custom-table-fixed-offset, 0px);
+  box-shadow: inset 0 1px 0 var(--dscp-table-border-color, #ebeef5);
+}
+
+/*
+ * 固定列 × 固定行交叉：Element UI 把固定列渲染在**另一张表**里（`.el-table__fixed`
+ * / `.el-table__fixed-right`），sticky 与层级要同样生效，否则交叉格会被独立滚动体盖住。
+ */
+.dscp-custom-table--fixed-row-top .el-table__fixed td[class*='-table__cell'],
+.dscp-custom-table--fixed-row-top .el-table__fixed-right td[class*='-table__cell'],
+.dscp-custom-table--fixed-row-bottom .el-table__fixed td[class*='-table__cell'],
+.dscp-custom-table--fixed-row-bottom .el-table__fixed-right td[class*='-table__cell'] {
+  z-index: 3;
+}
+
+/* 无分隔线（`bordered: false`）时固定行也不画分界线，保持干净表格观感 */
+.dscp-custom-table--borderless .dscp-custom-table--fixed-row-top > td[class*='-table__cell'],
+.dscp-custom-table--borderless .dscp-custom-table--fixed-row-bottom > td[class*='-table__cell'] {
+  box-shadow: none;
+}
+
+/* ---------- 固定表头（`fixedHeader`） ----------
+   表头固定靠「表格自身可滚动」：`ElTable` 在 `height` / `max-height` 下会把表头留在容器顶部，
+   组件在宿主未给确定高度时回落默认视口高度（见 `fixed-header.ts`）。
+   这里只做两件兜底：表头层级压过固定行（sticky 层级 2 / 3），以及表头底色兜底。 */
+.dscp-custom-table--fixed-header [class*='-table__header-wrapper'] {
+  position: relative;
+  z-index: 4;
+  background-color: var(--dscp-table-header-bg-color, #fff);
+}
+
+/* ---------- 滚动条：默认隐藏，鼠标移到表格上再出现 ----------
+   Element UI 的表格体用原生滚动条（`overflow: auto`），横 / 纵向常驻会遮挡单元格内容；
+   这里把滑块默认置为透明、只在**悬停表格**时上色（保留滚动条槽位宽度，避免出现 / 消失时布局跳动）。 */
+.dscp-custom-table .el-table__body-wrapper::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+.dscp-custom-table .el-table__body-wrapper::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.dscp-custom-table .el-table:hover .el-table__body-wrapper::-webkit-scrollbar-thumb {
+  background-color: var(--dscp-color-text-placeholder, #c0c4cc);
+}
+
+/* Firefox：透明滑块 -> 悬停上色（标准滚动条仍占位，不产生布局跳动） */
+.dscp-custom-table .el-table__body-wrapper {
+  scrollbar-color: transparent transparent;
+}
+
+.dscp-custom-table .el-table:hover .el-table__body-wrapper {
+  scrollbar-color: var(--dscp-color-text-placeholder, #c0c4cc) transparent;
+}
+
+/* 单元格文本行：单行省略，避免长文本撑破列宽 */
+.dscp-custom-table__cell-line,
+.dscp-custom-table__cell-tag-label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dscp-custom-table__cell-line {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.dscp-custom-table__cell-tag-label {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: bottom;
+}
+
+/* 次级行（多行单元格第二行起）：弱化字号与颜色 */
+.dscp-custom-table__cell-secondary {
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+}
+
+/* 全屏态：撑满视口并允许内部滚动 */
+.dscp-custom-table--fullscreen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: var(--dscp-space-md, 16px);
+  overflow: auto;
+  background: var(--dscp-color-surface, #fff);
+}
+
+/* 全屏按钮：图标尺寸略大，去掉文字按钮的内边距压迫感 */
+.dscp-custom-table__fullscreen-button {
+  padding: 7px;
+  font-size: var(--dscp-font-size-large, 18px);
+}
+
+/* 工具条：左右分区，右侧靠右对齐 */
+.dscp-custom-table__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dscp-space-sm, 12px);
+  margin-bottom: var(--dscp-space-sm, 12px);
+}
+
+.dscp-custom-table__toolbar-left,
+.dscp-custom-table__toolbar-right {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: var(--dscp-space-2xs, 8px);
+}
+
+.dscp-custom-table__toolbar-right {
+  justify-content: flex-end;
+}
+
+/*
+ * 列设置悬浮入口（`entry: 'floating'`）：贴表格左边缘、垂直居中。
+ *
+ * 默认 `opacity: 0`：指针悬停表格时淡入、移开淡出；键盘聚焦时也显示（无障碍）。
+ * `entryVisible: 'always'` 会额外挂 `__setting-floating-always` 常显。
+ * 用 `opacity` 而非 `display` / `visibility`：入口始终可聚焦，且不参与布局。
+ */
+.dscp-custom-table__setting-floating {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 10;
+  translate: 0 -50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.dscp-custom-table__setting-floating:focus-within,
+.dscp-custom-table__setting-floating-always,
+.dscp-custom-table:hover .dscp-custom-table__setting-floating {
+  opacity: 1;
+}
+
+/* 贴边半圆按钮：白底 + 投影，压在表格内容上仍可辨认；内边距收窄让 icon 居中且不占宽 */
+.dscp-custom-table__setting-floating .el-button {
+  padding: 10px 4px;
+  border-radius: 0 var(--dscp-radius-base, 4px) var(--dscp-radius-base, 4px) 0;
+  background: var(--dscp-color-white, #fff);
+  box-shadow: var(--dscp-shadow-sm, 0 2px 8px rgb(0 0 0 / 12%));
+}
+
+/*
+ * 列设置外置入口（`entry: 'outside'`，Vue 2 端缺省形态）：挂在表格容器**左侧之外**
+ * （`right: 100%`，不压住表格内容）、**顶部对齐**（贴表格左上角）。与悬浮入口的区别：
+ * 1. 悬停表格即给**整列底色**（不需要指针先进入按钮才出现底色）；
+ * 2. 列内纵向排列，后续新增按钮在同一条列里自顶部向下堆叠。
+ * 默认 `opacity: 0`：指针悬停表格淡入、移开淡出；键盘聚焦始终显示；`entryVisible: 'always'` 常显。
+ */
+.dscp-custom-table__actions {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--dscp-radius-base, 4px) 0 0 var(--dscp-radius-base, 4px);
+  background: var(--dscp-color-primary-light-9, #ecf5ff);
+  box-shadow: var(--dscp-shadow-sm, 0 2px 8px rgb(0 0 0 / 12%));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.dscp-custom-table__actions:focus-within,
+.dscp-custom-table__actions-always,
+.dscp-custom-table:hover .dscp-custom-table__actions {
+  opacity: 1;
+}
+
+/* 竖排按钮：去掉 Element UI 相邻按钮的横向外边距（否则第二条起会整体右移），内边距收窄让 icon 居中 */
+.dscp-custom-table__actions .el-button {
+  margin-left: 0;
+  padding: 9px 3px;
+  border-radius: var(--dscp-radius-base, 4px);
+}
+
+/* 分页：贴齐容器左右边缘 */
+.dscp-custom-table__pagination {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+/*
+ * 分页 legacy 容器：对齐旧版项目 Pagination（白底 + 32px 16px 内边距），按需选用。
+ *
+ * 刻意带一层 `.dscp-custom-table` 祖先类，把特异性提到 0,2,0：Element UI 主题里的
+ * `.el-pagination { padding: 2px 5px }` 与本类同为单类选择器，同特异性下只看样式表顺序，
+ * 而宿主（演练场、文档站、业务侧）通常把 `element-ui/style.css` 排在 kit 样式之后，
+ * 单类写法会被它盖掉（内边距静默失效）。search-table 的分页覆盖
+ * （`.dscp-search-table__table .dscp-custom-table__pagination`）用的是同一思路。
+ */
+.dscp-custom-table .dscp-custom-table--pagination-legacy {
+  position: relative;
+  background: #fff;
+  padding: 32px 16px;
+}
+
+/*
+ * 扩展行：判定列单元格（合并格）内容对齐。
+ *
+ * 展开后该列在组内纵向合并（`rowspan` = 组行数），单元格可能横跨好几行，两种口径由
+ * `expandable.mergeCellAlign` 选择：
+ * - `'center'`（默认类不挂修饰类）：整格垂直居中 —— `vertical-align: middle` 让内容居中，
+ *   包裹层 flex 行让「展开控件 + 取值」同一行、互相垂直居中；
+ * - `'top'`：与**组内首行（父行）齐平** —— 单元格 `vertical-align: top`、包裹层回到块级。
+ *
+ * 不用 `height: 100%` 撑内容：表格单元格没有确定高度，百分比高度会按内容解析（无效）。
+ */
+.dscp-custom-table__expand-cell {
+  vertical-align: middle;
+}
+
+.dscp-custom-table__expand-cell-top {
+  vertical-align: top;
+}
+
+.dscp-custom-table__expand-wrap {
+  display: flex;
+  align-items: center;
+  /* 合并格很窄时取值仍要能省略，不让内容把单元格撑宽 */
+  overflow: hidden;
+}
+
+.dscp-custom-table__expand-cell-top .dscp-custom-table__expand-wrap {
+  display: block;
+}
+
+.dscp-custom-table__expand-wrap > * {
+  min-width: 0;
+}
+
+/* 扩展行：控件列单元格内的展开 / 收起按钮（父行；子行与不可合并行不渲染） */
+.dscp-custom-table__expand-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  padding: 0;
+  border: 1px solid var(--dscp-color-border, #dcdfe6);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--dscp-color-text-regular, #606266);
+  font-size: 12px;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+/* 控件文案（`expandable.expandText` / `collapseText`）：仅配置时出现，图标与文案同一行 */
+.dscp-custom-table__expand-text {
+  margin: 0 4px 0 2px;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.dscp-custom-table__expand-toggle:hover,
+.dscp-custom-table__expand-toggle:focus-visible {
+  border-color: var(--dscp-color-primary, #409eff);
+  background: var(--dscp-color-primary-light-9, #ecf5ff);
+  color: var(--dscp-color-primary, #409eff);
+}
+
+.dscp-custom-table__expand-toggle:focus-visible {
+  outline: 2px solid var(--dscp-color-primary, #409eff);
+  outline-offset: 1px;
+}
+
+/* 已无展开余量（预览数 ≥ 子行数）且配置 `fullyPreviewedToggle: 'disable'`：置灰不可点 */
+.dscp-custom-table__expand-toggle.is-disabled,
+.dscp-custom-table__expand-toggle:disabled {
+  border-color: var(--dscp-color-border-lighter, #ebeef5);
+  background: transparent;
+  color: var(--dscp-color-text-placeholder, #c0c4cc);
+  cursor: not-allowed;
+}
+
+/*
+ * 无分隔线（`bordered: false`）：去掉行分隔线与表格外框，只保留斑马纹 / hover 底色。
+ * Element UI 的横线在 `th` / `td` 的 border-bottom 上，外框与竖线由 `.el-table--border`
+ * 与 `.el-table::before`（底部线）/ `::after`（右侧线）绘制。
+ */
+.dscp-custom-table--borderless .el-table th.el-table__cell,
+.dscp-custom-table--borderless .el-table td.el-table__cell {
+  border-bottom: none;
+}
+
+.dscp-custom-table--borderless .el-table::before,
+.dscp-custom-table--borderless .el-table--border::after {
+  display: none;
+}
+
+/* ---------- 表头拖拽（原生 DnD） ---------- */
+
+/*
+ * 顶层列表头里的拖拽手柄。
+ *
+ * 与 vue3 端的区别：这里是**可聚焦 + 可拖**的交互元素（原生 DnD 只能拖 `draggable` 元素，
+ * 键盘用户用左右方向键调序），故不是纯视觉装饰。
+ */
+.dscp-custom-table__drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: 12px;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: grab;
+  user-select: none;
+}
+
+.dscp-custom-table__drag-handle:active {
+  cursor: grabbing;
+}
+
+.dscp-custom-table__drag-handle:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--dscp-color-primary, #409eff);
+  outline-offset: 1px;
+  color: var(--dscp-color-primary, #409eff);
+}
+
+/*
+ * 落点线：贴在目标列的**就近边界**（`left` 由组件按指针位置内联下发）。
+ *
+ * 纵贯表头与数据区（`top: 0; bottom: 0`）—— 只画表头那截的话，用户看不出松手后的落点。
+ * `pointer-events: none` 不能省：线压在表头上，否则会挡住后续的 `dragover` 命中。
+ */
+.dscp-custom-table__drag-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 30;
+  width: 2px;
+  background: var(--dscp-color-primary, #409eff);
+  box-shadow: 0 0 4px var(--dscp-color-primary, #409eff);
+  pointer-events: none;
+}
+
+/* 无障碍播报容器：视觉隐藏但**留在可访问性树里**（读屏只朗读容器内容） */
+.dscp-custom-table__drag-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- 表头配置：抽屉「显示字段」区块 ---------- */
+.dscp-custom-table__setting-block {
+  padding: 4px 0 12px;
+}
+
+.dscp-custom-table__setting-title {
+  margin: 0 0 8px;
+  color: var(--dscp-color-text-primary, #303133);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dscp-custom-table__setting-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dscp-custom-table__setting-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--dscp-color-border-lighter, #ebeef5);
+  padding: 6px 0;
+  font-size: 13px;
+}
+
+.dscp-custom-table__setting-item-hidden .dscp-custom-table__setting-label {
+  color: var(--dscp-color-text-secondary, #909399);
+  text-decoration: line-through;
+}
+
+/*
+ * 抽屉行的列宽全部是**固定值**（不用 `space-between` / `flex: 1` 撑开）：
+ * 这样字段名与各能力组的起点、宽度逐行一致，标签与控件才能纵向对齐。
+ */
+.dscp-custom-table__setting-label {
+  display: inline-flex;
+  flex: 0 0 150px;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dscp-custom-table__setting-label-text {
+  overflow: hidden;
+  min-width: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dscp-custom-table__setting-field {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 底色 / 字色：标签 + 取色器 + 恢复默认 */
+.dscp-custom-table__setting-field-paint {
+  flex-basis: 100px;
+}
+
+/* 查询项 / 显示：标签 + 开关 */
+.dscp-custom-table__setting-field-toggle {
+  flex-basis: 84px;
+}
+
+/* 固定列：标签 + 下拉（不固定 / 左固定 / 右固定） */
+.dscp-custom-table__setting-field-fixed {
+  flex-basis: 126px;
+}
+
+.dscp-custom-table__setting-field-fixed .el-select {
+  width: 84px;
+}
+
+.dscp-custom-table__setting-hint {
+  flex: 0 0 36px;
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: 12px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/*
+ * 面板内底栏。
+ *
+ * Element UI 2.x 的 `el-drawer` 没有 `footer` 插槽（只有 `el-dialog` 有），
+ * 故重置按钮落在面板内底部，这里给它上边距与右对齐。
+ */
+.dscp-custom-table__setting-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+/*
+ * 面板内拖拽（原生 DnD）：让位过渡 / 跟手浮层由浏览器默认行为提供，
+ * 这里只补业务侧的落点与拖拽反馈（`is-*` 为 Element 状态类命名口径）。
+ */
+.dscp-custom-table__setting-item.is-drag-over {
+  border-radius: 4px;
+  box-shadow: inset 0 2px 0 var(--dscp-color-primary, #409eff);
+}
+
+.dscp-custom-table__setting-item.is-dragging {
+  border-radius: 4px;
+  background: var(--dscp-color-primary-light-9, #ecf5ff);
+  opacity: 0.7;
+}
+
+/* 悬停反馈：仅在非拖拽期间（拖拽中指针扫过会让多行一起亮，干扰落点判断） */
+.dscp-custom-table__setting-list:not(:has(.is-dragging)) .dscp-custom-table__setting-item:hover {
+  border-radius: 4px;
+  background: var(--dscp-color-fill-light, #f5f7fa);
+}
+
+/* 窄屏（≤768px）：工具条改为纵向堆叠，右侧回到左对齐 */
+@media (max-width: 768px) {
+  .dscp-custom-table__toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dscp-custom-table__toolbar-right {
+    justify-content: flex-start;
+  }
+}
+
+/* 单元格编辑器：外层容器在显示态 / 编辑态之间切换，宽度始终撑满单元格 */
+.dscp-edit-cell {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+/* 显示态：单行截断，高度对齐控件默认高度，避免编辑切换时行高跳变 */
+.dscp-edit-cell__display {
+  overflow: hidden;
+  min-height: var(--dscp-control-height-default, 32px);
+  line-height: var(--dscp-control-height-default, 32px);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 可编辑时才是按钮语义（渲染层只在 canEdit 时给 role="button"） */
+.dscp-edit-cell__display[role='button'] {
+  cursor: pointer;
+}
+
+.dscp-edit-cell__display[role='button']:focus-visible {
+  outline: 2px solid var(--dscp-color-primary-light-5, #a0cfff);
+  outline-offset: 1px;
+}
+
+/* 编辑态：容器铺满单元格，控件宽度跟随；高度由控件自身决定（表格行高可经
+   `--dscp-edit-cell-control-height` 或 schema 的 size 收敛） */
+.dscp-edit-cell__editor {
+  width: 100%;
+}
+
+.dscp-edit-cell__editor .el-input,
+.dscp-edit-cell__editor .el-select,
+.dscp-edit-cell__editor .el-input-number,
+.dscp-edit-cell__editor .el-date-editor {
+  width: 100%;
+}
+
+/*
+ * 错误态：边框标红（复用语义 token，不硬编码色值）。
+ *
+ * 与 vue3 端的差别：Element Plus 的输入框外层是 `.el-input__wrapper`（边框在那层），
+ * Element UI 直接把边框画在 `.el-input__inner` / `.el-textarea__inner` 上，
+ * 故这里是「改边框色」而不是「补内阴影」。
+ */
+.dscp-edit-cell--error .el-input__inner,
+.dscp-edit-cell--error .el-textarea__inner {
+  border-color: var(--dscp-color-danger, #f56c6c);
+}
+
+/* 错误文案：贴在下沿，字号小于正文，尽量不额外撑高行 */
+.dscp-edit-cell__error-text {
+  margin: var(--dscp-space-2xs, 4px) 0 0;
+  color: var(--dscp-color-danger, #f56c6c);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  line-height: 1.4;
+}
+
+/*
+ * DscpSearchTable 样式（Vue 2 / Element UI 版）。
+ *
+ * 与 vue3 端同源（`packages/vue3/src/table/search-table/style.css`），差异集中在四处：
+ * 1. **不写 `--el-*`**：Element UI 2.x 没有 CSS 变量主题层，配色一律走 `--dscp-*` token
+ *    （带字面量兜底）；查询区紧凑化也不再改组件尺寸变量，而是直接约束输入类控件内胆高度；
+ * 2. **单元格选择器不写死命名空间**：EU 的表格单元格类名跨版本有差异，统一用
+ *    `[class*='-table__cell']` 属性子串匹配（与 `custom-table/style.css` 同口径）；
+ * 3. **无 `ElTableV2` 分支**：虚拟滚动只有切片策略，保留 `ElTable` 原生外观；
+ * 4. **要关掉 `.el-table` 自带的 `flex: 1`**：否则下发的高度会被 flex 收缩成容器剩余空间，
+ *    自动高度变成自引用（见下文表格区块注释）。
+ *
+ * 两条结构约定，改动前务必先读：
+ *
+ * 1. **卡片类必须挂在真实包裹层上**（模板里的 `.dscp-search-table__table` div）。
+ *    `DscpCustomTable` 关闭了 `inheritAttrs` 且把 `$attrs`（含 `class`）透传给内部 `el-table`；
+ *    卡片类若写在组件上会落到 `el-table` 上，本文件里所有 `__table .el-table` 后代选择器
+ *    会整体落空，表现为「有边框、没留白、表头没底色」的样式残缺。
+ * 2. **表格宽度交给容器**，不要用 `width: calc(100% - 40px) + margin` 做左右留白：
+ *    百分比宽度在容器尺寸突变（进出全屏）时与 Element 的列宽重算不同步，
+ *    会在表格右侧留下一条旧宽度的空白。左右留白统一由卡片 `padding` 提供。
+ */
+
+.dscp-search-table {
+  display: flex;
+  position: relative;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.dscp-search-table--fullscreen {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: var(--dscp-space-md, 16px);
+  overflow: hidden;
+  background: var(--dscp-color-surface, #fff);
+}
+
+/* ---------- 查询区 ---------- */
+
+.dscp-search-table__search {
+  flex: none;
+  margin-bottom: var(--dscp-space-2xs, 8px);
+  /*
+   * 查询区紧凑高度（源码 mini 尺寸的观感）。
+   * Element UI 2.x 没有 `--el-component-size*` 变量层，只能自己约束控件内胆高度；
+   * 这里抽成变量，宿主要改查询区控件高度时**只需覆盖这一个变量**，
+   * 不要再在别处写死像素 —— 否则控件高度与图标行高各写各的，图标必然上下漂移。
+   */
+  --dscp-search-table-input-height: 26px;
+}
+
+.dscp-search-table__search .dscp-section__body {
+  padding: 6px 14px 15px;
+}
+
+.dscp-search-table__search .el-form-item {
+  margin-bottom: 0;
+}
+
+.dscp-search-table__search .el-form-item__label {
+  padding: 0 8px 0 0;
+  color: var(--dscp-color-text-regular, #606266);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  line-height: var(--dscp-search-table-input-height, 26px);
+}
+
+/*
+ * 查询区紧凑化：输入框 / 下拉 / 日期区间共用 `.el-input__inner`，
+ * 高度与行高统一取紧凑高度变量。
+ */
+.dscp-search-table__search .el-input__inner,
+.dscp-search-table__search .el-range-editor.el-input__inner {
+  height: var(--dscp-search-table-input-height, 26px);
+  line-height: var(--dscp-search-table-input-height, 26px);
+}
+
+/*
+ * 后缀 / 前缀图标（`.el-input__icon`：下拉箭头 `.el-select__caret`、清空 ×、日期图标……）
+ * 原来靠写死的行高（26px）与内胆高度对齐，两者强耦合：宿主一旦改控件高度
+ * （Element 的 small / mini、业务侧覆盖成 32px 等），行内盒的行高就与控件高度脱节，
+ * 图标随之漂移 —— 实测 32px 控件时箭头比控件中心低约 1.25px，看着像「图标下移」。
+ *
+ * 改为 flex 居中：图标盒子沿用 Element 的 `height: 100%` 撑满控件高度，
+ * 图形在盒内垂直居中，**不再读行高** —— 控件尺寸（size / 紧凑高度）怎么变都不会错位。
+ */
+.dscp-search-table__search .el-input__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/*
+ * Element 给 `.el-input__icon::after` 加了 `height: 100%` 的零宽撑高伪元素（配合行高对齐），
+ * flex 布局下它会变成一个满高 flex 项、把图形挤偏，这里直接去掉。
+ */
+.dscp-search-table__search .el-input__icon::after {
+  display: none;
+}
+
+/*
+ * 日期区间的日历 / 清空图标与普通输入框后缀图标同名（`.el-input__icon`），
+ * 但它们属于区间编辑器（`inline-flex` 布局，图标自带 `float`），
+ * 需要按区间图标再复位一次，避免被通用图标规则影响；
+ * 不依赖具体高度，后续再调整紧凑高度也不会错位。
+ */
+.dscp-search-table__search .el-range-editor.el-input__inner .el-range__icon,
+.dscp-search-table__search .el-range-editor.el-input__inner .el-range__close-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dscp-search-table__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/*
+ * 标题图标可能是 kit SVG（裸 `<svg><use>`，无自身尺寸，如搜索放大镜），
+ * 也可能是 Element UI 字体图标：一律把 svg 约束为 1em，与文字同高，
+ * 避免未定尺寸的 SVG 把标题撑爆。
+ */
+.dscp-search-table__title svg {
+  width: 1em;
+  height: 1em;
+  flex: none;
+}
+
+.dscp-search-table__actions {
+  display: flex;
+  align-items: center;
+}
+
+.dscp-search-table__extra {
+  margin-top: 6px;
+}
+
+/* ---------- 收缩态保留字段 ---------- */
+
+/*
+ * 部分折叠：折叠时只保留带标记的顶层项（普通字段 / 整组），其余项仅从布局移除。
+ * 不卸载控件：表单实例、校验态与 Element 字段注册保持不变。
+ */
+.dscp-search-table__search--collapsed
+  .dscp-custom-form__grid
+  > :not(.dscp-search-table__collapsed-field) {
+  display: none;
+}
+
+.dscp-search-table__collapsed-setting {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: 0 8px 0 0;
+  padding: 0;
+  color: var(--dscp-color-text-secondary, #909399);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.dscp-search-table__collapsed-setting:hover,
+.dscp-search-table__collapsed-setting:focus-visible {
+  color: var(--dscp-color-primary, #409eff);
+  border-color: var(--dscp-color-border, #dcdfe6);
+  background: var(--dscp-color-bg, #fff);
+  outline: none;
+}
+
+.dscp-search-table__collapsed-setting:focus-visible {
+  box-shadow: 0 0 0 2px var(--dscp-color-primary-light-5, #a0cfff);
+}
+
+.dscp-search-table__collapsed-setting--active {
+  color: var(--dscp-color-primary, #409eff);
+  border-color: var(--dscp-color-primary-light-7, #c6e2ff);
+}
+
+/*
+ * 浮层内容分三段（标题/说明 → 候选项 → 恢复默认），用浅分隔线划开层级。
+ * 宽度由模板下发给 Popover（260px），这里只兜住上限，避免窄屏溢出。
+ */
+.dscp-search-table__collapsed-setting-panel {
+  max-width: 280px;
+}
+
+.dscp-search-table__collapsed-setting-title {
+  color: var(--dscp-color-text-primary, #303133);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.dscp-search-table__collapsed-setting-hint {
+  margin: 4px 0 10px;
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/*
+ * 候选项按「两列 × 固定两排」网格展示：浮层高度不随字段数量增长，
+ * 超出两排的项在列表内滚动查看，不会把查询区整块盖住。
+ * 内容区固定 66px = 32px 行高 × 2 + 2px 行间距（padding 另计）。
+ */
+.dscp-search-table__collapsed-setting-list {
+  box-sizing: content-box;
+  max-height: 66px;
+  padding: 6px 0 2px;
+  overflow: auto;
+  border-top: 1px solid var(--dscp-color-border-lighter, #ebeef5);
+}
+
+/*
+ * 网格必须落在 checkbox-group 上：它是 Element 额外渲染的一层容器，
+ * 只给外层 list 设布局时，内部仍按 inline 流排布（会挤成「一行三个」）。
+ */
+.dscp-search-table__collapsed-setting-list .el-checkbox-group {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 32px;
+  gap: 2px 8px;
+}
+
+.dscp-search-table__collapsed-setting-list .el-checkbox {
+  display: flex;
+  box-sizing: border-box;
+  width: 100%;
+  height: 32px;
+  align-items: center;
+  margin: 0;
+  padding: 0 8px;
+  border-radius: 4px;
+  line-height: 20px;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.dscp-search-table__collapsed-setting-list .el-checkbox:hover,
+.dscp-search-table__collapsed-setting-list .el-checkbox:focus-within {
+  background: var(--dscp-color-primary-light-9, #ecf5ff);
+}
+
+.dscp-search-table__collapsed-setting-list .el-checkbox__input {
+  flex: none;
+}
+
+/*
+ * Tooltip 触发层撑满标签区：Element 两端会在插槽外再包一层容器，
+ * 用带前缀的类名（而非 `> span` 结构选择器）才不会被这层容器打断。
+ */
+.dscp-search-table__collapsed-setting-list .dscp-search-table__collapsed-setting-tooltip {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+/* 长标签省略：只有被截断的项才由 Tooltip 提示全称。 */
+.dscp-search-table__collapsed-setting-list .el-checkbox__label {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.dscp-search-table__collapsed-setting-list .dscp-search-table__collapsed-setting-label {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dscp-search-table__collapsed-setting-empty {
+  padding: 12px 0;
+  color: var(--dscp-color-text-placeholder, #a8abb2);
+  font-size: 12px;
+  text-align: center;
+}
+
+.dscp-search-table__collapsed-setting-footer {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--dscp-color-border-lighter, #ebeef5);
+  text-align: right;
+}
+
+/* ---------- 查询区与列表之间的页签 ---------- */
+
+.dscp-search-table__tabs {
+  flex: none;
+  margin-bottom: 8px;
+  padding: 0 14px;
+  background: var(--dscp-color-bg, #fff);
+  border: 1px solid var(--dscp-color-border, #dcdfe6);
+  border-radius: 8px;
+}
+
+/* el-tabs 自带下外边距会与卡片留白叠加，这里清零由外层 padding 统一控制。 */
+.dscp-search-table__tabs .el-tabs__header {
+  margin: 0;
+}
+
+/* 页签只作筛选条，面板内容为空，隐藏内容区避免多余留白。 */
+.dscp-search-table__tabs .el-tabs__content {
+  display: none;
+}
+
+.dscp-search-table__tabs .el-radio-group {
+  padding: 6px 0;
+}
+
+/* ---------- 列表卡片 ---------- */
+
+.dscp-search-table__table {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  padding: 0 20px;
+  overflow: hidden;
+  border: 1px solid var(--dscp-color-border, #dcdfe6);
+  border-radius: var(--dscp-radius-lg, 8px);
+  background: var(--dscp-color-surface, #fff);
+}
+
+/* CustomTable 根节点撑满卡片，内部「工具栏 / 表格 / 分页」三段纵向排布 */
+.dscp-search-table__table > .dscp-custom-table {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+/*
+ * 全屏态：全屏目标是整个 SearchTable 根节点，卡片外已有留白，
+ * 内部 CustomTable 自己的全屏内边距与滚动条不再需要（会叠出双份留白且与卡片边框冲突）。
+ */
+.dscp-search-table__table > .dscp-custom-table--fullscreen {
+  padding: 0;
+  overflow: hidden;
+}
+
+.dscp-search-table__table .dscp-custom-table__toolbar {
+  flex: none;
+  margin-bottom: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--dscp-color-border, #dcdfe6);
+}
+
+.dscp-search-table__table .dscp-custom-table__toolbar-left {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+}
+
+.dscp-search-table__table .dscp-custom-table__pagination {
+  min-height: 52px;
+  margin: 0;
+  padding: 10px 0;
+  flex: none;
+}
+
+.dscp-search-table__table .el-table {
+  width: 100%;
+  /*
+   * Element UI 给 `.el-table` 自带 `flex: 1`（`flex-basis: 0%` + 可收缩），
+   * 会对我们下发的内联 `height` 做 flex 收缩 —— 表格高度变成「容器剩余空间」，
+   * 自动高度随即变成**自引用**（量到的永远是上一次下发的高度），
+   * 表现为「进出全屏后表格停在全屏高度、缩不回去」。这里关掉伸缩，
+   * 高度完全由 `height` 属性（自动高度编排下发）决定。
+   */
+  flex: none;
+  color: var(--dscp-color-text-primary, #303133);
+  font-size: var(--dscp-font-size-base, 14px);
+  line-height: 1.5;
+}
+
+.dscp-search-table__table .el-table th[class*='-table__cell'] {
+  padding: 7px 0;
+  color: var(--dscp-color-text-secondary, #909399);
+  background: var(--dscp-table-header-bg-color, #f8fafc);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  font-weight: 700;
+}
+
+.dscp-search-table__table .el-table td[class*='-table__cell'] {
+  padding: 6px 0;
+  vertical-align: top;
+}
+
+/*
+ * 例外：扩展行判定列（组内纵向合并，`rowspan` 可能横跨好几行）。
+ *
+ * 上面的 `vertical-align: top` 是普通单元格口径（小字号紧凑排版），会压过组件里
+ * `expandable.mergeCellAlign` 的对齐规则（本文件选择器权重更高），所以这里按组件口径
+ * **两种对齐都补一遍**：`'center'` 整格居中 / `'top'` 与组内首行（父行）齐平。
+ */
+.dscp-search-table__table .el-table td.dscp-custom-table__expand-cell {
+  vertical-align: middle;
+}
+
+.dscp-search-table__table .el-table td.dscp-custom-table__expand-cell-top {
+  vertical-align: top;
+}
+
+.dscp-search-table__table .el-table [class~='cell'] {
+  padding: 0 4px;
+  line-height: 18px;
+  white-space: normal;
+}
+
+.dscp-search-table__table .el-table th > [class~='cell'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 表格工具栏 ---------- */
+
+.dscp-search-table__table-toolbar {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  /* 工具栏变窄时让按钮组换行，而不是把标题挤成竖排（标题不参与压缩） */
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  color: var(--dscp-color-text-primary, #303133);
+  font-weight: 600;
+}
+
+.dscp-search-table__table-toolbar-title {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.dscp-search-table__table-toolbar-title-extra {
+  color: var(--dscp-color-text-secondary, #909399);
+  font-size: var(--dscp-font-size-extra-small, 12px);
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .dscp-search-table__table-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dscp-search-table__table-toolbar > .dscp-button-group {
+    flex-wrap: wrap;
+  }
+}
+
+.dscp-virtual-list {
+  position: relative;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.dscp-virtual-list__spacer {
+  position: relative;
+  width: 100%;
+}
+
+.dscp-virtual-list__item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.dscp-virtual-list__header,
+.dscp-virtual-list__footer {
+  position: relative;
+  width: 100%;
+}
+
